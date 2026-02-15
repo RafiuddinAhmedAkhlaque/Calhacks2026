@@ -114,7 +114,6 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
       <div
         style={{
           flex: 1,
-          overflowY: "auto",
           padding: "16px",
           minHeight: "100%"
         }}
