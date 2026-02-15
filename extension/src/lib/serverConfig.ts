@@ -1,5 +1,4 @@
-const rawServerBaseUrl =
-  import.meta.env.VITE_SERVER_BASE_URL ?? "http://localhost:3001";
+const rawServerBaseUrl = import.meta.env.VITE_SERVER_BASE_URL;
 
 // Normalize once so callers can safely append paths.
 export const SERVER_BASE_URL = rawServerBaseUrl.replace(/\/+$/, "");
