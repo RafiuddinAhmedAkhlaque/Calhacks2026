@@ -53,6 +53,7 @@ export function initDatabase() {
       question TEXT NOT NULL,
       options TEXT NOT NULL,
       correct_index INTEGER NOT NULL,
+      explanation TEXT,
       created_at TEXT NOT NULL
     );
 
@@ -74,7 +75,28 @@ export function initDatabase() {
       selected_index INTEGER NOT NULL,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS user_wallets (
+      user_id TEXT PRIMARY KEY REFERENCES users(id),
+      coins INTEGER NOT NULL DEFAULT 50,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS room_pools (
+      room_id TEXT PRIMARY KEY REFERENCES rooms(id),
+      total_coins INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL
+    );
   `);
+
+  // Backwards-safe migration for existing DBs.
+  try {
+    sqlite.exec("ALTER TABLE questions ADD COLUMN explanation TEXT");
+  } catch (error: any) {
+    if (!String(error?.message ?? "").includes("duplicate column name")) {
+      throw error;
+    }
+  }
 
   console.log("[DB] Database initialized");
 }

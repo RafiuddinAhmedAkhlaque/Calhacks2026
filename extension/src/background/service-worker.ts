@@ -268,7 +268,6 @@ async function handleQuizAnswer(
   }
 
   state.consecutiveCorrect = 0;
-  state.currentQuestionIndex += 1;
   state.wrongAnswers.push({
     question: q.question,
     options: q.options,
@@ -276,7 +275,16 @@ async function handleQuizAnswer(
     selectedIndex,
   });
 
-  await broadcastQuizState(domain, "Wrong answer. Streak reset.", "wrong");
+  const correctAnswer = q.options[q.correctIndex] ?? "Unknown";
+  const explanation = q.explanation?.trim();
+  const explanationBlock = explanation
+    ? `\n\nWhy this is correct:\n${explanation}`
+    : "";
+  await broadcastQuizState(
+    domain,
+    `Wrong answer.\nCorrect answer: ${correctAnswer}${explanationBlock}\n\nStreak reset.`,
+    "wrong"
+  );
 }
 
 // ---- Time Tracking ----

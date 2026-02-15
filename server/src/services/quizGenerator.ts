@@ -14,6 +14,7 @@ interface GeneratedQuestion {
   question: string;
   options: string[];
   correctIndex: number;
+  explanation?: string;
 }
 
 // Retry helper with exponential backoff
@@ -52,6 +53,10 @@ export async function generateQuestionsFromText(
 2. Have exactly 4 options (A, B, C, D)
 3. Have exactly one correct answer
 4. Be clear and unambiguous
+5. Include an in-depth explanation (3-5 sentences) that:
+   - explains why the correct answer is right using details from the material
+   - briefly explains why the chosen distractors are wrong
+   - teaches the underlying concept, not just the final answer
 
 Study Material:
 ---
@@ -62,8 +67,9 @@ Respond ONLY with a valid JSON array. No markdown, no code fences, just the raw 
 - "question": string (the question text)
 - "options": string[] (exactly 4 options)
 - "correctIndex": number (0-3, index of the correct option)
+- "explanation": string (in-depth reasoning, 3-5 sentences)
 
-Example: [{"question": "What is X?", "options": ["A", "B", "C", "D"], "correctIndex": 2}]`;
+Example: [{"question": "What is X?", "options": ["A", "B", "C", "D"], "correctIndex": 2, "explanation": "C is correct because ..."}]`;
 
   return withRetry(async () => {
     console.log("[QuizGen] Sending request to Groq...");
@@ -96,7 +102,8 @@ Example: [{"question": "What is X?", "options": ["A", "B", "C", "D"], "correctIn
         q.options.length === 4 &&
         typeof q.correctIndex === "number" &&
         q.correctIndex >= 0 &&
-        q.correctIndex <= 3
+        q.correctIndex <= 3 &&
+        (q.explanation === undefined || typeof q.explanation === "string")
     );
 
     console.log(
@@ -122,6 +129,7 @@ export async function generateAndStoreQuestions(
       question: q.question,
       options: JSON.stringify(q.options),
       correctIndex: q.correctIndex,
+      explanation: q.explanation?.trim() || null,
       createdAt: now,
     });
   }
@@ -146,5 +154,6 @@ export async function getRandomQuestions(roomId: string, count: number = 5) {
     question: q.question,
     options: JSON.parse(q.options) as string[],
     correctIndex: q.correctIndex,
+    explanation: q.explanation ?? undefined,
   }));
 }

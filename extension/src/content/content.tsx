@@ -70,7 +70,7 @@ function renderQuiz(): void {
           ${q.options
             .map(
               (opt, i) => `
-            <button class="scrollstop-option" data-index="${i}" style="animation: scrollstop-stagger 0.25s ease-out ${i * 0.06}s both">
+            <button class="scrollstop-option${feedbackType === "wrong" && i === q.correctIndex ? " scrollstop-option-reveal" : ""}" data-index="${i}" style="animation: scrollstop-stagger 0.25s ease-out ${i * 0.06}s both">
               <span class="scrollstop-option-letter">${String.fromCharCode(65 + i)}</span>
               <span>${opt}</span>
             </button>

@@ -35,7 +35,9 @@ router.post("/", async (req, res) => {
     res.json(room);
   } catch (error) {
     console.error("[Rooms] Error creating room:", error);
-    res.status(500).json({ error: "Failed to create room" });
+    const message =
+      error instanceof Error ? error.message : "Failed to create room";
+    res.status(400).json({ error: message });
   }
 });
 

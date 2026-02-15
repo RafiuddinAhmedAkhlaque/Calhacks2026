@@ -24,6 +24,7 @@ export function Login({ onLogin }: LoginProps) {
         id: user.id,
         username: user.username,
         token,
+        coins: user.coins,
       };
       await saveUser(stored);
       onLogin(stored);
