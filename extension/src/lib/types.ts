@@ -39,6 +39,14 @@ export interface WrongAnswerPayload {
   documentId?: string;
 }
 
+export interface CorrectAnswerPayload {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  roomId?: string;
+  documentId?: string;
+}
+
 export interface Document {
   id: string;
   roomId: string;
@@ -70,6 +78,16 @@ export interface WrongQuestionReview {
   options: string[];
   correctIndex: number;
   selectedIndex: number;
+  createdAt: string;
+}
+
+export interface CorrectQuestionReview {
+  id: string;
+  roomId: string | null;
+  documentId: string | null;
+  question: string;
+  options: string[];
+  correctIndex: number;
   createdAt: string;
 }
 

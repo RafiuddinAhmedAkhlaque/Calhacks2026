@@ -6,7 +6,9 @@ import type {
   Document,
   AllTimeStats,
   WrongQuestionReview,
+  CorrectQuestionReview,
   WrongAnswerPayload,
+  CorrectAnswerPayload,
 } from "./types";
 import { getUser } from "./storage";
 import { API_BASE_URL } from "./serverConfig";
@@ -147,4 +149,8 @@ export async function getMyStats(): Promise<AllTimeStats> {
 
 export async function getWrongQuestions(): Promise<WrongQuestionReview[]> {
   return request("/review/wrong-questions");
+}
+
+export async function getCorrectQuestions(): Promise<CorrectQuestionReview[]> {
+  return request("/review/correct-questions");
 }

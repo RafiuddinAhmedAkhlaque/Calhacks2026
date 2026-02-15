@@ -5,15 +5,17 @@ import {
   joinRoom,
   getMyStats,
   getWrongQuestions,
+  getCorrectQuestions,
 } from "@/lib/api";
 import { clearUser, type StoredUser } from "@/lib/storage";
-import type { Room, AllTimeStats, WrongQuestionReview } from "@/lib/types";
+import type { Room, AllTimeStats, WrongQuestionReview, CorrectQuestionReview } from "@/lib/types";
 
 interface DashboardProps {
   user: StoredUser;
   onOpenRoom: (roomId: string) => void;
   onOpenSettings: () => void;
   onOpenWrongQuestions: () => void;
+  onOpenCorrectQuestions: () => void;
   onLogout: () => void;
 }
 
@@ -22,6 +24,7 @@ export function Dashboard({
   onOpenRoom,
   onOpenSettings,
   onOpenWrongQuestions,
+  onOpenCorrectQuestions,
   onLogout,
 }: DashboardProps) {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -38,6 +41,9 @@ export function Dashboard({
   const [wrongQuestions, setWrongQuestions] = useState<WrongQuestionReview[]>(
     [],
   );
+  const [correctQuestions, setCorrectQuestions] = useState<CorrectQuestionReview[]>(
+    [],
+  );
 
   useEffect(() => {
     loadRooms();
@@ -48,15 +54,19 @@ export function Dashboard({
       const r = await getMyRooms();
       setRooms(r);
 
-      const [s, w] = await Promise.allSettled([
+      const [s, w, c] = await Promise.allSettled([
         getMyStats(),
         getWrongQuestions(),
+        getCorrectQuestions(),
       ]);
       if (s.status === "fulfilled") {
         setStats(s.value);
       }
       if (w.status === "fulfilled") {
         setWrongQuestions(w.value);
+      }
+      if (c.status === "fulfilled") {
+        setCorrectQuestions(c.value);
       }
     } catch (err) {
       console.error("Failed to load rooms:", err);
@@ -390,7 +400,7 @@ export function Dashboard({
             padding: "8px 10px",
           }}
         >
-          <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Time Spent Not Locked In Today</div>
+          <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Usage</div>
           <div
             style={{
               fontSize: 12,
@@ -411,7 +421,7 @@ export function Dashboard({
           }}
         >
           <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-            Number of Questions Answered All-Time
+            Wrong Questions
           </div>
           <div
             style={{
@@ -425,6 +435,40 @@ export function Dashboard({
         </div>
       </div>
 
+      {/* Correct Questions Count Button */}
+      <div style={{ padding: "0 16px 8px" }}>
+        <button
+          onClick={onOpenCorrectQuestions}
+          style={{
+            width: "100%",
+            padding: "8px 10px",
+            background: "var(--bg-surface)",
+            color: "var(--text-secondary)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius-sm)",
+            fontSize: 11,
+            textAlign: "left",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "var(--bg-hover)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "#48BB78";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "var(--bg-surface)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "var(--border)";
+          }}
+        >
+          Correct Questions Count ({correctQuestions.length})
+        </button>
+      </div>
+
+      {/* Wrong Questions Count Button */}
       <div style={{ padding: "0 16px 8px" }}>
         <button
           onClick={onOpenWrongQuestions}
@@ -453,7 +497,7 @@ export function Dashboard({
               "var(--border)";
           }}
         >
-          View Wrong Questions ({wrongQuestions.length})
+          Wrong Questions Count ({wrongQuestions.length})
         </button>
       </div>
 

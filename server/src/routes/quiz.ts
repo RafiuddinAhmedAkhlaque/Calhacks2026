@@ -3,7 +3,7 @@ import { getRandomQuestions } from "../services/quizGenerator.js";
 import { updateMemberScore } from "../services/roomManager.js";
 import { authenticate } from "../middleware.js";
 import { db } from "../db/index.js";
-import { userStats, wrongQuestions } from "../db/schema.js";
+import { userStats, wrongQuestions, correctQuestions } from "../db/schema.js";
 import { eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
@@ -33,7 +33,7 @@ router.get("/:roomId", async (req, res) => {
 // POST /api/quiz/submit
 router.post("/submit", async (req, res) => {
   try {
-    const { roomId, score, totalQuestions, usageSeconds, wrongAnswers } =
+    const { roomId, score, totalQuestions, usageSeconds, wrongAnswers, correctAnswers } =
       req.body;
 
     if (!roomId || typeof score !== "number") {
@@ -101,6 +101,31 @@ router.post("/submit", async (req, res) => {
 
       if (rows.length > 0) {
         await db.insert(wrongQuestions).values(rows);
+      }
+    }
+
+    if (Array.isArray(correctAnswers) && correctAnswers.length > 0) {
+      const rows = correctAnswers
+        .filter(
+          (c) =>
+            c &&
+            typeof c.question === "string" &&
+            Array.isArray(c.options) &&
+            typeof c.correctIndex === "number"
+        )
+        .map((c) => ({
+          id: nanoid(),
+          userId: req.userId!,
+          roomId: typeof c.roomId === "string" ? c.roomId : roomId,
+          documentId: typeof c.documentId === "string" ? c.documentId : null,
+          question: c.question,
+          options: JSON.stringify(c.options),
+          correctIndex: Math.floor(c.correctIndex),
+          createdAt: now,
+        }));
+
+      if (rows.length > 0) {
+        await db.insert(correctQuestions).values(rows);
       }
     }
 

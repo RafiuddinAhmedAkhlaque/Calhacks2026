@@ -74,6 +74,17 @@ export function initDatabase() {
       selected_index INTEGER NOT NULL,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS correct_questions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id),
+      room_id TEXT REFERENCES rooms(id),
+      document_id TEXT REFERENCES documents(id),
+      question TEXT NOT NULL,
+      options TEXT NOT NULL,
+      correct_index INTEGER NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
 
   console.log("[DB] Database initialized");

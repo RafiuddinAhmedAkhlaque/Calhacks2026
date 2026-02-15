@@ -82,3 +82,16 @@ export const wrongQuestions = sqliteTable("wrong_questions", {
   selectedIndex: integer("selected_index").notNull(),
   createdAt: text("created_at").notNull(),
 });
+
+export const correctQuestions = sqliteTable("correct_questions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  roomId: text("room_id").references(() => rooms.id),
+  documentId: text("document_id").references(() => documents.id),
+  question: text("question").notNull(),
+  options: text("options").notNull(),
+  correctIndex: integer("correct_index").notNull(),
+  createdAt: text("created_at").notNull(),
+});

@@ -9,6 +9,7 @@ import type {
   QuizQuestion,
   MessageType,
   WrongAnswerPayload,
+  CorrectAnswerPayload,
 } from "@/lib/types";
 import { API_BASE_URL } from "@/lib/serverConfig";
 
@@ -27,6 +28,7 @@ interface DomainQuizState {
   consecutiveCorrect: number;
   requiredCorrect: number;
   wrongAnswers: WrongAnswerPayload[];
+  correctAnswers: CorrectAnswerPayload[];
 }
 
 const quizStatesByDomain: Record<string, DomainQuizState> = {};
@@ -171,6 +173,7 @@ async function ensureQuizState(domain: string): Promise<DomainQuizState> {
       consecutiveCorrect: 0,
       requiredCorrect: REQUIRED_CORRECT,
       wrongAnswers: [],
+      correctAnswers: [],
     };
   }
 
@@ -227,6 +230,10 @@ async function submitQuizCompletion(
         ...w,
         roomId: settings.activeRoomId!,
       })),
+      correctAnswers: state.correctAnswers.map((c) => ({
+        ...c,
+        roomId: settings.activeRoomId!,
+      })),
     }),
   });
 }
@@ -249,6 +256,13 @@ async function handleQuizAnswer(
 
   if (selectedIndex === q.correctIndex) {
     state.consecutiveCorrect += 1;
+
+    // Track correct answer
+    state.correctAnswers.push({
+      question: q.question,
+      options: q.options,
+      correctIndex: q.correctIndex,
+    });
 
     if (state.consecutiveCorrect >= state.requiredCorrect) {
       const usageSeconds = await consumeDomainUsageAndUnblock(domain);

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { getWrongQuestions } from "@/lib/api";
-import type { WrongQuestionReview } from "@/lib/types";
+import { getCorrectQuestions } from "@/lib/api";
+import type { CorrectQuestionReview } from "@/lib/types";
 
-interface WrongQuestionsProps {
+interface CorrectQuestionsProps {
   onBack: () => void;
 }
 
-export function WrongQuestions({ onBack }: WrongQuestionsProps) {
-  const [questions, setQuestions] = useState<WrongQuestionReview[]>([]);
+export function CorrectQuestions({ onBack }: CorrectQuestionsProps) {
+  const [questions, setQuestions] = useState<CorrectQuestionReview[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,10 +16,10 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
 
   const loadQuestions = async () => {
     try {
-      const q = await getWrongQuestions();
+      const q = await getCorrectQuestions();
       setQuestions(q);
     } catch (err) {
-      console.error("Failed to load wrong questions:", err);
+      console.error("Failed to load correct questions:", err);
     } finally {
       setLoading(false);
     }
@@ -33,7 +33,7 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
             width: 28,
             height: 28,
             border: "2px solid var(--bg-elevated)",
-            borderTopColor: "var(--accent)",
+            borderTopColor: "var(--success)",
             borderRadius: "50%",
             animation: "spin 0.7s linear infinite",
           }}
@@ -72,8 +72,8 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
           }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLButtonElement).style.borderColor =
-              "var(--border-accent)";
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
+              "#48BB78";
+            (e.currentTarget as HTMLButtonElement).style.color = "#48BB78";
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLButtonElement).style.borderColor =
@@ -106,7 +106,7 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
             textTransform: "uppercase",
           }}
         >
-          Wrong Questions
+          Correct Questions
         </h2>
       </div>
 
@@ -115,7 +115,6 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
         style={{
           flex: 1,
           padding: "16px",
-          minHeight: 0
         }}
       >
         {questions.length === 0 ? (
@@ -146,12 +145,14 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="var(--success)"
+                stroke="var(--text-muted)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <polyline points="20 6 9 17 4 12" />
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
               </svg>
             </div>
             <div
@@ -161,9 +162,9 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
                 textAlign: "center",
               }}
             >
-              No wrong answers yet!
+              No correct answers yet.
               <br />
-              Keep up the great work.
+              Keep practicing!
             </div>
           </div>
         ) : (
@@ -191,35 +192,6 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
                   {q.question}
                 </div>
 
-                {/* Your Answer */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 6,
-                    marginBottom: 4,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: "var(--danger)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    ✗
-                  </div>
-                  <div
-                    style={{
-                      flex: 1,
-                      fontSize: 11,
-                      color: "var(--danger)",
-                    }}
-                  >
-                    Your answer: {q.options[q.selectedIndex] ?? "Unknown"}
-                  </div>
-                </div>
-
                 {/* Correct Answer */}
                 <div
                   style={{
@@ -242,9 +214,10 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
                       flex: 1,
                       fontSize: 11,
                       color: "var(--success)",
+                      fontWeight: 500,
                     }}
                   >
-                    Correct: {q.options[q.correctIndex] ?? "Unknown"}
+                    Answer: {q.options[q.correctIndex] ?? "Unknown"}
                   </div>
                 </div>
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware.js";
 import { db } from "../db/index.js";
-import { userStats, wrongQuestions } from "../db/schema.js";
+import { userStats, wrongQuestions, correctQuestions } from "../db/schema.js";
 import { desc, eq } from "drizzle-orm";
 
 const router = Router();
@@ -55,6 +55,35 @@ router.get("/review/wrong-questions", async (req, res) => {
   } catch (error) {
     console.error("[Analytics] Error loading wrong questions:", error);
     res.status(500).json({ error: "Failed to load wrong questions" });
+  }
+});
+
+// GET /api/review/correct-questions
+router.get("/review/correct-questions", async (req, res) => {
+  try {
+    const rows = await db
+      .select({
+        id: correctQuestions.id,
+        roomId: correctQuestions.roomId,
+        documentId: correctQuestions.documentId,
+        question: correctQuestions.question,
+        options: correctQuestions.options,
+        correctIndex: correctQuestions.correctIndex,
+        createdAt: correctQuestions.createdAt,
+      })
+      .from(correctQuestions)
+      .where(eq(correctQuestions.userId, req.userId!))
+      .orderBy(desc(correctQuestions.createdAt));
+
+    res.json(
+      rows.map((r) => ({
+        ...r,
+        options: JSON.parse(r.options) as string[],
+      }))
+    );
+  } catch (error) {
+    console.error("[Analytics] Error loading correct questions:", error);
+    res.status(500).json({ error: "Failed to load correct questions" });
   }
 });
 

@@ -5,13 +5,15 @@ import { Dashboard } from "./pages/Dashboard";
 import { RoomView } from "./pages/RoomView";
 import { Settings } from "./pages/Settings";
 import { WrongQuestions } from "./pages/WrongQuestions";
+import { CorrectQuestions } from "./pages/CorrectQuestions";
 
 type Page =
   | { name: "login" }
   | { name: "dashboard" }
   | { name: "room"; roomId: string }
   | { name: "settings" }
-  | { name: "wrongQuestions" };
+  | { name: "wrongQuestions" }
+  | { name: "correctQuestions" };
 
 export function Popup() {
   const [user, setUser] = useState<StoredUser | null>(null);
@@ -82,6 +84,7 @@ export function Popup() {
           onOpenRoom={(roomId) => setPage({ name: "room", roomId })}
           onOpenSettings={() => setPage({ name: "settings" })}
           onOpenWrongQuestions={() => setPage({ name: "wrongQuestions" })}
+          onOpenCorrectQuestions={() => setPage({ name: "correctQuestions" })}
           onLogout={handleLogout}
         />
       );
@@ -97,5 +100,7 @@ export function Popup() {
       return <Settings onBack={() => setPage({ name: "dashboard" })} />;
     case "wrongQuestions":
       return <WrongQuestions onBack={() => setPage({ name: "dashboard" })} />;
+    case "correctQuestions":
+      return <CorrectQuestions onBack={() => setPage({ name: "dashboard" })} />;
   }
 }
