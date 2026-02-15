@@ -22,3 +22,4 @@ server/uploads/
 # Build output
 extension/dist/
 *.db-shm
+server/scrollstop.db-shm
