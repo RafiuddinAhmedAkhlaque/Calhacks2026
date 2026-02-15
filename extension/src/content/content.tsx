@@ -87,7 +87,7 @@ function renderQuiz(): void {
               (opt, i) => `
             <button class="scrollstop-option${feedbackType === "wrong" && answerRevealed && i === q.correctIndex ? " scrollstop-option-reveal" : ""}${feedbackType === "wrong" && answerRevealed && i === lastWrongSelectedIndex ? " scrollstop-option-disabled" : ""}" data-index="${i}" style="animation: scrollstop-stagger 0.25s ease-out ${i * 0.06}s both">
               <span class="scrollstop-option-letter">${String.fromCharCode(65 + i)}</span>
-              <span style="min-width:0">${opt}${feedbackType === "wrong" && answerRevealed && i === q.correctIndex ? " (Correct answer)" : ""}</span>
+              <span style="min-width:0" style="min-width:0">${opt}${feedbackType === "wrong" && answerRevealed && i === q.correctIndex ? " (Correct answer)" : ""}</span>
             </button>
           `,
             )
