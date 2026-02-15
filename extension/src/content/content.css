@@ -199,7 +199,7 @@
 
 .scrollstop-option {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   width: 100%;
   padding: 16px 14px;

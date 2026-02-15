@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { getUser, type StoredUser } from "@/lib/storage";
+import { getUser, getOnboarded, setOnboarded, type StoredUser } from "@/lib/storage";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { RoomView } from "./pages/RoomView";
 import { Settings } from "./pages/Settings";
 import { WrongQuestions } from "./pages/WrongQuestions";
+import { Onboarding } from "./pages/Onboarding";
 
 type Page =
   | { name: "login" }
+  | { name: "onboarding" }
   | { name: "dashboard" }
   | { name: "room"; roomId: string }
   | { name: "settings" }
@@ -19,10 +21,11 @@ export function Popup() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getUser().then((u) => {
+    getUser().then(async (u) => {
       if (u) {
         setUser(u);
-        setPage({ name: "dashboard" });
+        const onboarded = await getOnboarded();
+        setPage(onboarded ? { name: "dashboard" } : { name: "onboarding" });
       }
       setLoading(false);
     });
@@ -62,8 +65,14 @@ export function Popup() {
     );
   }
 
-  const handleLogin = (u: StoredUser) => {
+  const handleLogin = async (u: StoredUser) => {
     setUser(u);
+    const onboarded = await getOnboarded();
+    setPage(onboarded ? { name: "dashboard" } : { name: "onboarding" });
+  };
+
+  const handleOnboardingComplete = async () => {
+    await setOnboarded();
     setPage({ name: "dashboard" });
   };
 
@@ -75,6 +84,8 @@ export function Popup() {
   switch (page.name) {
     case "login":
       return <Login onLogin={handleLogin} />;
+    case "onboarding":
+      return <Onboarding onComplete={handleOnboardingComplete} />;
     case "dashboard":
       return (
         <Dashboard
