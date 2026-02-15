@@ -1,0 +1,23 @@
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.vite/
+*.log
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+server/.env
+
+# Database
+*.db
+*.db-journal
+*.db-wal
+
+# Uploads
+server/uploads/
+
+# Build output
+extension/dist/
