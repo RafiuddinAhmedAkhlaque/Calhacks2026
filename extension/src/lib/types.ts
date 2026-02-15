@@ -111,11 +111,13 @@ export type MessageType =
       currentQuestionIndex?: number;
       consecutiveCorrect?: number;
       requiredCorrect?: number;
+      lastWrongSelectedIndex?: number | null;
       feedbackText?: string;
       feedbackType?: "correct" | "wrong" | "success";
     }
   | { type: "UNBLOCK_PAGE" }
   | { type: "QUIZ_ANSWER"; selectedIndex: number }
+  | { type: "QUIZ_NEXT" }
   | {
       type: "QUIZ_COMPLETED";
       score: number;
