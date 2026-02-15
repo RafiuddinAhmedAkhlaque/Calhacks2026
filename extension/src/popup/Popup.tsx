@@ -5,6 +5,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { RoomView } from "./pages/RoomView";
 import { Settings } from "./pages/Settings";
 import { WrongQuestions } from "./pages/WrongQuestions";
+import { Activity } from "./pages/Activity";
 import { Onboarding } from "./pages/Onboarding";
 
 type Page =
@@ -13,6 +14,7 @@ type Page =
   | { name: "dashboard" }
   | { name: "room"; roomId: string }
   | { name: "settings" }
+  | { name: "activity" }
   | { name: "wrongQuestions" };
 
 export function Popup() {
@@ -92,6 +94,7 @@ export function Popup() {
           user={user!}
           onOpenRoom={(roomId) => setPage({ name: "room", roomId })}
           onOpenSettings={() => setPage({ name: "settings" })}
+          onOpenActivity={() => setPage({ name: "activity" })}
           onOpenWrongQuestions={() => setPage({ name: "wrongQuestions" })}
           onLogout={handleLogout}
         />
@@ -106,6 +109,8 @@ export function Popup() {
       );
     case "settings":
       return <Settings onBack={() => setPage({ name: "dashboard" })} />;
+    case "activity":
+      return <Activity onBack={() => setPage({ name: "dashboard" })} />;
     case "wrongQuestions":
       return <WrongQuestions onBack={() => setPage({ name: "dashboard" })} />;
   }

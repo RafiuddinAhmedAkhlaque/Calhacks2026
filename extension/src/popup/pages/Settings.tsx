@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  getSettings,
-  saveSettings,
-  getTimeTracking,
-  saveTimeTracking,
-} from "@/lib/storage";
+import { getSettings, saveSettings } from "@/lib/storage";
 import type { ScrollStopSettings, DomainConfig } from "@/lib/types";
-import type { TimeTrackingData } from "@/lib/storage";
 
 interface SettingsProps {
   onBack: () => void;
@@ -14,26 +8,14 @@ interface SettingsProps {
 
 export function Settings({ onBack }: SettingsProps) {
   const [settings, setSettings] = useState<ScrollStopSettings | null>(null);
-  const [timeData, setTimeData] = useState<TimeTrackingData>({});
   const [newDomain, setNewDomain] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     (async () => {
       const s = await getSettings();
-      const t = await getTimeTracking();
       setSettings(s);
-      setTimeData(t);
     })();
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(async () => {
-      const t = await getTimeTracking();
-      setTimeData(t);
-    }, 1000);
-
-    return () => clearInterval(id);
   }, []);
 
   const handleSave = async (updates: Partial<ScrollStopSettings>) => {
@@ -71,19 +53,6 @@ export function Settings({ onBack }: SettingsProps) {
     if (!settings) return;
     const domains = settings.trackedDomains.filter((_, i) => i !== index);
     handleSave({ trackedDomains: domains });
-  };
-
-  const resetAllTime = async () => {
-    await saveTimeTracking({});
-    setTimeData({});
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1500);
-  };
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}m ${s}s`;
   };
 
   if (!settings) {
@@ -331,21 +300,6 @@ export function Settings({ onBack }: SettingsProps) {
                     {d.domain}
                   </span>
 
-                  {timeData[d.domain] && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontFamily: "var(--font-display)",
-                        color: timeData[d.domain].blocked
-                          ? "var(--danger)"
-                          : "var(--text-muted)",
-                        letterSpacing: "0.02em",
-                      }}
-                    >
-                      {formatTime(timeData[d.domain].totalSeconds)}
-                    </span>
-                  )}
-
                   <button
                     onClick={() => removeDomain(i)}
                     style={{
@@ -452,151 +406,6 @@ export function Settings({ onBack }: SettingsProps) {
             </div>
           </div>
 
-          {/* Time Tracking Stats */}
-          {Object.keys(timeData).length > 0 && (
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 10,
-                }}
-              >
-                <label
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "var(--text-muted)",
-                  }}
-                >
-                  Time tracked
-                </label>
-                <button
-                  onClick={resetAllTime}
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 700,
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                    color: "var(--danger)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "2px 0",
-                    transition: "opacity 0.15s",
-                    opacity: 0.7,
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.opacity =
-                      "0.7";
-                  }}
-                >
-                  Reset all
-                </button>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {Object.entries(timeData).map(([domain, data]) => {
-                  const pct =
-                    settings.timeLimitMinutes > 0
-                      ? Math.min(
-                          (data.totalSeconds /
-                            (settings.timeLimitMinutes * 60)) *
-                            100,
-                          100,
-                        )
-                      : 0;
-                  return (
-                    <div
-                      key={domain}
-                      style={{
-                        padding: "10px 12px",
-                        background: "var(--bg-surface)",
-                        borderRadius: "var(--radius-sm)",
-                        border: "1px solid var(--border)",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: 6,
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: "var(--text-secondary)",
-                          }}
-                        >
-                          {domain}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            color: data.blocked
-                              ? "var(--danger)"
-                              : "var(--text-primary)",
-                          }}
-                        >
-                          {formatTime(data.totalSeconds)}
-                          {data.blocked && (
-                            <span
-                              style={{
-                                marginLeft: 6,
-                                fontSize: 9,
-                                padding: "2px 6px",
-                                borderRadius: 4,
-                                background: "var(--danger-dim)",
-                                color: "var(--danger)",
-                                letterSpacing: "0.06em",
-                                textTransform: "uppercase",
-                              }}
-                            >
-                              Blocked
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                      {/* Progress bar */}
-                      <div
-                        style={{
-                          height: 3,
-                          background: "var(--bg-elevated)",
-                          borderRadius: 3,
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            width: `${pct}%`,
-                            background: data.blocked
-                              ? "var(--danger)"
-                              : pct > 75
-                                ? "var(--warning)"
-                                : "var(--accent)",
-                            borderRadius: 3,
-                            transition: "width 0.4s ease",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
