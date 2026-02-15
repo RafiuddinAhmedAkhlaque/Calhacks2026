@@ -30,38 +30,50 @@ function renderQuiz(): void {
   if (!overlayContainer || questions.length === 0) return;
 
   const q = questions[currentQuestionIndex % questions.length];
+  const progressPct = (consecutiveCorrect / REQUIRED_CORRECT) * 100;
+
+  // Build streak dots
+  const dots = Array.from({ length: REQUIRED_CORRECT }, (_, i) => {
+    const filled = i < consecutiveCorrect;
+    const justFilled = i === consecutiveCorrect - 1 && consecutiveCorrect > 0;
+    return `<div class="scrollstop-dot${filled ? ' filled' : ''}${justFilled ? ' pulse' : ''}"></div>`;
+  }).join('');
 
   overlayContainer.innerHTML = `
     <div class="scrollstop-backdrop">
-      <div class="scrollstop-modal">
+      <div class="scrollstop-topbar">
+        <div class="scrollstop-topbar-fill" style="width: ${progressPct}%"></div>
+      </div>
+
+      <div class="scrollstop-card">
         <div class="scrollstop-header">
-          <div class="scrollstop-logo">🛑 ScrollStop</div>
-          <div class="scrollstop-subtitle">
-            Time's up! Answer ${REQUIRED_CORRECT} questions in a row to continue.
+          <div class="scrollstop-brand">
+            <div class="scrollstop-logo">ScrollStop</div>
+            <div class="scrollstop-subtitle">${REQUIRED_CORRECT - consecutiveCorrect} more to unlock</div>
+          </div>
+          <div class="scrollstop-dots">
+            ${dots}
           </div>
         </div>
 
-        <div class="scrollstop-progress">
-          <div class="scrollstop-progress-bar">
-            <div class="scrollstop-progress-fill" style="width: ${(consecutiveCorrect / REQUIRED_CORRECT) * 100}%"></div>
-          </div>
-          <div class="scrollstop-progress-text">${consecutiveCorrect} / ${REQUIRED_CORRECT} correct in a row</div>
-        </div>
+        <div class="scrollstop-divider"></div>
 
         <div class="scrollstop-question">
+          <div class="scrollstop-question-label">Question</div>
           <div class="scrollstop-question-text">${q.question}</div>
-          <div class="scrollstop-options">
-            ${q.options
-              .map(
-                (opt, i) => `
-              <button class="scrollstop-option" data-index="${i}">
-                <span class="scrollstop-option-letter">${String.fromCharCode(65 + i)}</span>
-                <span>${opt}</span>
-              </button>
-            `
-              )
-              .join("")}
-          </div>
+        </div>
+
+        <div class="scrollstop-options">
+          ${q.options
+            .map(
+              (opt, i) => `
+            <button class="scrollstop-option" data-index="${i}" style="animation: scrollstop-stagger 0.25s ease-out ${i * 0.06}s both">
+              <span class="scrollstop-option-letter">${String.fromCharCode(65 + i)}</span>
+              <span>${opt}</span>
+            </button>
+          `
+            )
+            .join("")}
         </div>
 
         <div class="scrollstop-footer">
@@ -89,13 +101,11 @@ function handleAnswer(selectedIndex: number, correctIndex: number): void {
     consecutiveCorrect++;
 
     if (consecutiveCorrect >= REQUIRED_CORRECT) {
-      // Success! Unblock
       if (feedback) {
-        feedback.textContent = "🎉 You did it! Page unlocked.";
+        feedback.textContent = "Page unlocked. Get back to work.";
         feedback.className = "scrollstop-streak-warning scrollstop-success";
       }
 
-      // Notify background
       chrome.runtime.sendMessage({ type: "QUIZ_COMPLETED", score: REQUIRED_CORRECT });
 
       setTimeout(() => {
@@ -108,20 +118,19 @@ function handleAnswer(selectedIndex: number, correctIndex: number): void {
     }
 
     if (feedback) {
-      feedback.textContent = `✅ Correct! ${REQUIRED_CORRECT - consecutiveCorrect} more to go.`;
+      feedback.textContent = `Correct — ${REQUIRED_CORRECT - consecutiveCorrect} more to go`;
       feedback.className = "scrollstop-streak-warning scrollstop-correct";
     }
   } else {
     consecutiveCorrect = 0;
     if (feedback) {
-      feedback.textContent = "❌ Wrong! Streak reset. Try again.";
+      feedback.textContent = "Wrong answer. Streak reset.";
       feedback.className = "scrollstop-streak-warning scrollstop-wrong";
     }
   }
 
   currentQuestionIndex++;
 
-  // Briefly show feedback, then next question
   setTimeout(() => {
     renderQuiz();
   }, 1200);

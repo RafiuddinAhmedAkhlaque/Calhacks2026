@@ -35,42 +35,126 @@ export function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-[500px] px-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
-          🛑 ScrollStop
+    <div className="page-enter flex flex-col items-center justify-center h-[500px] px-10">
+      {/* Decorative top bar */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: 'linear-gradient(90deg, var(--accent), transparent)',
+        }}
+      />
+
+      <div className="text-center mb-10">
+        {/* Logo mark */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 48,
+            height: 48,
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--accent-dim)',
+            border: '1px solid var(--border-accent)',
+            marginBottom: 20,
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+        </div>
+
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.02em',
+            marginBottom: 8,
+          }}
+        >
+          SCROLLSTOP
         </h1>
-        <p className="text-sm text-slate-400 leading-relaxed">
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+            maxWidth: 240,
+            margin: '0 auto',
+          }}
+        >
           Stop doomscrolling. Compete with friends.
           <br />
-          Learn something instead.
+          <span style={{ color: 'var(--accent)' }}>Learn something instead.</span>
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-xs space-y-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-xs" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
           <label
             htmlFor="username"
-            className="block text-xs font-medium text-slate-400 mb-1.5"
+            style={{
+              display: 'block',
+              fontFamily: 'var(--font-display)',
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase' as const,
+              color: 'var(--text-muted)',
+              marginBottom: 8,
+            }}
           >
-            Choose a username
+            Username
           </label>
           <input
             id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter username..."
+            placeholder="pick a name..."
             autoFocus
-            className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl
-                       text-white placeholder-slate-500 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                       transition-all"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-primary)',
+              fontSize: 14,
+              fontFamily: 'var(--font-body)',
+              outline: 'none',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = 'var(--border-accent)';
+              e.target.style.boxShadow = '0 0 0 3px var(--accent-dim)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = 'var(--border)';
+              e.target.style.boxShadow = 'none';
+            }}
           />
         </div>
 
         {error && (
-          <div className="text-red-400 text-xs bg-red-400/10 px-3 py-2 rounded-lg">
+          <div
+            style={{
+              fontSize: 12,
+              color: 'var(--danger)',
+              background: 'var(--danger-dim)',
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-sm)',
+              fontWeight: 500,
+            }}
+          >
             {error}
           </div>
         )}
@@ -78,16 +162,47 @@ export function Login({ onLogin }: LoginProps) {
         <button
           type="submit"
           disabled={loading || !username.trim()}
-          className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700
-                     disabled:text-slate-500 text-white font-semibold text-sm rounded-xl
-                     transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+          style={{
+            width: '100%',
+            padding: '12px 0',
+            background: loading || !username.trim() ? 'var(--bg-elevated)' : 'var(--accent)',
+            color: loading || !username.trim() ? 'var(--text-muted)' : 'var(--text-inverse)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase' as const,
+            border: 'none',
+            borderRadius: 'var(--radius-md)',
+            cursor: loading || !username.trim() ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            if (!loading && username.trim()) {
+              (e.target as HTMLButtonElement).style.background = 'var(--accent-hover)';
+              (e.target as HTMLButtonElement).style.transform = 'translateY(-1px)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading && username.trim()) {
+              (e.target as HTMLButtonElement).style.background = 'var(--accent)';
+              (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
+            }
+          }}
         >
           {loading ? "Connecting..." : "Get Started"}
         </button>
       </form>
 
-      <p className="text-xs text-slate-500 mt-6 text-center">
-        No account needed — just pick a name and go.
+      <p
+        style={{
+          fontSize: 11,
+          color: 'var(--text-muted)',
+          marginTop: 24,
+          textAlign: 'center',
+        }}
+      >
+        No account needed — just pick a name.
       </p>
     </div>
   );

@@ -1,4 +1,8 @@
-/* ScrollStop Quiz Overlay Styles */
+/* ScrollStop Quiz Overlay */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+
+/* ---- Reset & Container ---- */
 
 #scrollstop-overlay {
   position: fixed !important;
@@ -10,164 +14,317 @@
   pointer-events: all !important;
 }
 
+#scrollstop-overlay * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Backdrop ---- */
+
 .scrollstop-backdrop {
   width: 100%;
   height: 100%;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(12px);
+  background: #0C0C0C;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  animation: scrollstop-fadeIn 0.4s ease-out;
+  position: relative;
+  overflow: hidden;
 }
 
-.scrollstop-modal {
-  background: linear-gradient(145deg, #1e293b, #0f172a);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 20px;
-  padding: 40px;
-  max-width: 520px;
-  width: 90%;
-  box-shadow:
-    0 0 60px rgba(99, 102, 241, 0.15),
-    0 25px 50px rgba(0, 0, 0, 0.5);
+/* Full-screen red gradient wash at the top */
+.scrollstop-backdrop::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 140%;
+  height: 80%;
+  background: radial-gradient(ellipse at center, rgba(229, 62, 62, 0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
+
+/* Scanline texture */
+.scrollstop-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.008) 2px,
+    rgba(255, 255, 255, 0.008) 4px
+  );
+  pointer-events: none;
+}
+
+/* ---- Top Bar (fixed at top of screen) ---- */
+
+.scrollstop-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #1A1A1A;
+  z-index: 10;
+}
+
+.scrollstop-topbar-fill {
+  height: 100%;
+  background: #E53E3E;
+  box-shadow: 0 0 20px rgba(229, 62, 62, 0.5), 0 0 60px rgba(229, 62, 62, 0.2);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Main Card ---- */
+
+.scrollstop-card {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 520px;
+  animation: scrollstop-slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Header Section ---- */
 
 .scrollstop-header {
-  text-align: center;
-  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.scrollstop-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .scrollstop-logo {
-  font-size: 28px;
-  font-weight: 800;
-  color: #e2e8f0;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #E53E3E;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .scrollstop-subtitle {
-  font-size: 14px;
-  color: #94a3b8;
-  line-height: 1.5;
+  font-size: 13px;
+  color: #5C5852;
+  line-height: 1.4;
 }
 
-/* Progress Bar */
-.scrollstop-progress {
+/* ---- Streak Dots ---- */
+
+.scrollstop-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.scrollstop-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #2A2A2A;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scrollstop-dot.filled {
+  background: #E53E3E;
+  border-color: #E53E3E;
+  box-shadow: 0 0 8px rgba(229, 62, 62, 0.4);
+}
+
+.scrollstop-dot.pulse {
+  animation: scrollstop-dotPulse 0.5s ease;
+}
+
+@keyframes scrollstop-dotPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Divider ---- */
+
+.scrollstop-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06) 20%, rgba(255, 255, 255, 0.06) 80%, transparent);
   margin-bottom: 28px;
 }
 
-.scrollstop-progress-bar {
-  height: 8px;
-  background: #1e293b;
-  border-radius: 100px;
-  overflow: hidden;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-}
+/* ---- Question ---- */
 
-.scrollstop-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #6366f1, #818cf8);
-  border-radius: 100px;
-  transition: width 0.4s ease;
-}
-
-.scrollstop-progress-text {
-  text-align: center;
-  font-size: 13px;
-  color: #94a3b8;
-  margin-top: 8px;
-  font-weight: 500;
-}
-
-/* Question */
 .scrollstop-question {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.scrollstop-question-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #E53E3E;
+  margin-bottom: 12px;
 }
 
 .scrollstop-question-text {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  color: #f1f5f9;
-  margin-bottom: 20px;
+  color: #F5F0EB;
   line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
+/* ---- Options Grid ---- */
+
 .scrollstop-options {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 .scrollstop-option {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  align-items: flex-start;
+  gap: 10px;
   width: 100%;
-  padding: 14px 18px;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(99, 102, 241, 0.15);
+  padding: 16px 14px;
+  background: #141414;
+  border: 1px solid #1E1E1E;
   border-radius: 12px;
-  color: #e2e8f0;
-  font-size: 15px;
+  color: #C8C2BB;
+  font-size: 13px;
+  font-family: 'DM Sans', system-ui, sans-serif;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   text-align: left;
-  font-family: inherit;
-  line-height: 1.4;
+  line-height: 1.45;
+  position: relative;
 }
 
 .scrollstop-option:hover {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: rgba(99, 102, 241, 0.4);
-  transform: translateY(-1px);
+  background: #1A1A1A;
+  border-color: #E53E3E;
+  color: #F5F0EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(229, 62, 62, 0.1);
 }
 
 .scrollstop-option:active {
   transform: translateY(0);
+  background: rgba(229, 62, 62, 0.06);
 }
 
 .scrollstop-option-letter {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
-  border-radius: 8px;
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid #2A2A2A;
+  color: #5C5852;
+  font-family: 'Space Mono', monospace;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11px;
+  transition: all 0.15s ease;
 }
 
-/* Footer / Feedback */
+.scrollstop-option:hover .scrollstop-option-letter {
+  border-color: #E53E3E;
+  color: #E53E3E;
+  background: rgba(229, 62, 62, 0.08);
+}
+
+/* ---- Feedback ---- */
+
 .scrollstop-footer {
-  min-height: 32px;
-  margin-top: 8px;
+  min-height: 44px;
+  position: relative;
 }
 
 .scrollstop-streak-warning {
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 8px;
+  padding: 12px 16px;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .scrollstop-correct {
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.1);
+  color: #4ADE80;
+  background: rgba(74, 222, 128, 0.06);
+  border: 1px solid rgba(74, 222, 128, 0.1);
 }
 
 .scrollstop-wrong {
-  color: #f87171;
-  background: rgba(248, 113, 113, 0.1);
+  color: #FF4A4A;
+  background: rgba(255, 74, 74, 0.06);
+  border: 1px solid rgba(255, 74, 74, 0.1);
+  animation: scrollstop-shake 0.4s ease;
 }
 
 .scrollstop-success {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-  font-size: 16px;
+  color: #E53E3E;
+  background: rgba(229, 62, 62, 0.08);
+  border: 1px solid rgba(229, 62, 62, 0.15);
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---- Keyframes ---- */
+
+@keyframes scrollstop-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scrollstop-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollstop-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollstop-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(6px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
 }
