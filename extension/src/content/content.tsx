@@ -87,7 +87,7 @@ function renderQuiz(): void {
               (opt, i) => `
             <button class="scrollstop-option${feedbackType === "wrong" && answerRevealed && i === q.correctIndex ? " scrollstop-option-reveal" : ""}${feedbackType === "wrong" && answerRevealed && i === lastWrongSelectedIndex ? " scrollstop-option-disabled" : ""}" data-index="${i}" style="animation: scrollstop-stagger 0.25s ease-out ${i * 0.06}s both">
               <span class="scrollstop-option-letter">${String.fromCharCode(65 + i)}</span>
-              <span>${opt}${feedbackType === "wrong" && answerRevealed && i === q.correctIndex ? " (Correct answer)" : ""}</span>
+              <span style="min-width:0">${opt}${feedbackType === "wrong" && answerRevealed && i === q.correctIndex ? " (Correct answer)" : ""}</span>
             </button>
           `,
             )
@@ -113,9 +113,7 @@ function renderQuiz(): void {
     </div>
   `;
 
-  const feedbackEl = overlayContainer.querySelector(
-    "#scrollstop-feedback",
-  ) as HTMLElement | null;
+  const feedbackEl = overlayContainer.querySelector("#scrollstop-feedback") as HTMLElement | null;
   if (feedbackEl && visibleFeedbackText) {
     feedbackEl.textContent = visibleFeedbackText;
     feedbackEl.className = `scrollstop-streak-warning scrollstop-${feedbackType}`;
@@ -156,33 +154,31 @@ function renderQuiz(): void {
 
 // ---- Message Listener ----
 
-chrome.runtime.onMessage.addListener(
-  (message: MessageType, _sender, sendResponse) => {
-    if (message.type === "BLOCK_PAGE") {
-      questions = message.questions;
-      currentQuestionIndex = message.currentQuestionIndex ?? 0;
-      consecutiveCorrect = message.consecutiveCorrect ?? 0;
-      requiredCorrect = message.requiredCorrect ?? 5;
-      lastWrongSelectedIndex = message.lastWrongSelectedIndex ?? null;
-      feedbackText = message.feedbackText ?? "";
-      feedbackType = message.feedbackType ?? "correct";
-      answerPending = false;
-      answerRevealed = false;
-      createOverlay();
-      sendResponse({ success: true });
-    } else if (message.type === "UNBLOCK_PAGE") {
-      questions = [];
-      currentQuestionIndex = 0;
-      consecutiveCorrect = 0;
-      requiredCorrect = 5;
-      lastWrongSelectedIndex = null;
-      feedbackText = "";
-      answerPending = false;
-      answerRevealed = false;
-      removeOverlay();
-      sendResponse({ success: true });
-    }
-  },
-);
+chrome.runtime.onMessage.addListener((message: MessageType, _sender, sendResponse) => {
+  if (message.type === "BLOCK_PAGE") {
+    questions = message.questions;
+    currentQuestionIndex = message.currentQuestionIndex ?? 0;
+    consecutiveCorrect = message.consecutiveCorrect ?? 0;
+    requiredCorrect = message.requiredCorrect ?? 5;
+    lastWrongSelectedIndex = message.lastWrongSelectedIndex ?? null;
+    feedbackText = message.feedbackText ?? "";
+    feedbackType = message.feedbackType ?? "correct";
+    answerPending = false;
+    answerRevealed = false;
+    createOverlay();
+    sendResponse({ success: true });
+  } else if (message.type === "UNBLOCK_PAGE") {
+    questions = [];
+    currentQuestionIndex = 0;
+    consecutiveCorrect = 0;
+    requiredCorrect = 5;
+    lastWrongSelectedIndex = null;
+    feedbackText = "";
+    answerPending = false;
+    answerRevealed = false;
+    removeOverlay();
+    sendResponse({ success: true });
+  }
+});
 
 console.log("[ScrollStop] Content script loaded");

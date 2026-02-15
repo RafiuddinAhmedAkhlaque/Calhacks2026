@@ -13,6 +13,7 @@ interface DashboardProps {
   user: StoredUser;
   onOpenRoom: (roomId: string) => void;
   onOpenSettings: () => void;
+  onOpenActivity: () => void;
   onOpenWrongQuestions: () => void;
   onLogout: () => void;
 }
@@ -21,6 +22,7 @@ export function Dashboard({
   user,
   onOpenRoom,
   onOpenSettings,
+  onOpenActivity,
   onOpenWrongQuestions,
   onLogout,
 }: DashboardProps) {
@@ -166,6 +168,50 @@ export function Dashboard({
           </p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <button
+            onClick={onOpenActivity}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 32,
+              height: 32,
+              background: "transparent",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--text-secondary)",
+              cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "var(--border-accent)";
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "var(--accent)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "var(--border)";
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "var(--text-secondary)";
+            }}
+            title="Activity"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="12" width="4" height="9" rx="1" />
+              <rect x="10" y="7" width="4" height="14" rx="1" />
+              <rect x="17" y="3" width="4" height="18" rx="1" />
+            </svg>
+          </button>
           <button
             onClick={onOpenSettings}
             style={{
