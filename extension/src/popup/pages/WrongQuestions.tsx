@@ -114,8 +114,9 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
       <div
         style={{
           flex: 1,
-          flexDirection: "column",
-          padding: "16px"
+          overflowY: "auto",
+          padding: "16px",
+          minHeight: "100%"
         }}
       >
         {questions.length === 0 ? (
@@ -167,7 +168,7 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
             </div>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, minHeight: "100%" }}>
             {questions.map((q) => (
               <div
                 key={q.id}
