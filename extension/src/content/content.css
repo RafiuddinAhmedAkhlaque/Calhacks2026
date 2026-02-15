@@ -214,6 +214,9 @@
   text-align: left;
   line-height: 1.45;
   position: relative;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-height: 0;
 }
 
 .scrollstop-option:hover {
@@ -236,6 +239,7 @@
   width: 22px;
   height: 22px;
   min-width: 22px;
+  flex-shrink: 0;
   border-radius: 4px;
   background: transparent;
   border: 1px solid #2A2A2A;

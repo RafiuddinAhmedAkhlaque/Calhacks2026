@@ -72,7 +72,7 @@ function renderQuiz(): void {
               (opt, i) => `
             <button class="scrollstop-option" data-index="${i}" style="animation: scrollstop-stagger 0.25s ease-out ${i * 0.06}s both">
               <span class="scrollstop-option-letter">${String.fromCharCode(65 + i)}</span>
-              <span>${opt}</span>
+              <span style="min-width:0">${opt}</span>
             </button>
           `
             )
