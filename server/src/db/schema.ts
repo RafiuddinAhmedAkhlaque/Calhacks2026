@@ -55,6 +55,7 @@ export const questions = sqliteTable("questions", {
   question: text("question").notNull(),
   options: text("options").notNull(), // JSON array
   correctIndex: integer("correct_index").notNull(),
+  explanation: text("explanation"),
   createdAt: text("created_at").notNull(),
 });
 
@@ -81,4 +82,20 @@ export const wrongQuestions = sqliteTable("wrong_questions", {
   correctIndex: integer("correct_index").notNull(),
   selectedIndex: integer("selected_index").notNull(),
   createdAt: text("created_at").notNull(),
+});
+
+export const userWallets = sqliteTable("user_wallets", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id),
+  coins: integer("coins").notNull().default(50),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const roomPools = sqliteTable("room_pools", {
+  roomId: text("room_id")
+    .primaryKey()
+    .references(() => rooms.id),
+  totalCoins: integer("total_coins").notNull().default(0),
+  updatedAt: text("updated_at").notNull(),
 });

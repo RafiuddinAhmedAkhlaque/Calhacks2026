@@ -49,6 +49,10 @@ export async function login(
   });
 }
 
+export async function getMe(): Promise<User> {
+  return request("/auth/me");
+}
+
 // ---- Rooms ----
 
 export async function createRoom(name: string): Promise<Room> {

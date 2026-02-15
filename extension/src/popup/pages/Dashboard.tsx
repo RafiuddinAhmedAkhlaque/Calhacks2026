@@ -48,10 +48,7 @@ export function Dashboard({
       const r = await getMyRooms();
       setRooms(r);
 
-      const [s, w] = await Promise.allSettled([
-        getMyStats(),
-        getWrongQuestions(),
-      ]);
+      const [s, w] = await Promise.allSettled([getMyStats(), getWrongQuestions()]);
       if (s.status === "fulfilled") {
         setStats(s.value);
       }

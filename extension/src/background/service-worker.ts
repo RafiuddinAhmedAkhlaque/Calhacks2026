@@ -27,6 +27,7 @@ interface DomainQuizState {
   consecutiveCorrect: number;
   requiredCorrect: number;
   wrongAnswers: WrongAnswerPayload[];
+  lastWrongSelectedIndex: number | null;
 }
 
 const quizStatesByDomain: Record<string, DomainQuizState> = {};
@@ -45,7 +46,7 @@ function extractDomain(url: string): string | null {
 async function isTrackedDomain(domain: string): Promise<boolean> {
   const settings = await getSettings();
   return settings.trackedDomains.some(
-    (d) => d.enabled && domain.includes(d.domain)
+    (d) => d.enabled && domain.includes(d.domain),
   );
 }
 
@@ -114,7 +115,7 @@ async function fetchQuizQuestions(): Promise<QuizQuestion[]> {
 function buildBlockMessage(
   state: DomainQuizState,
   feedbackText?: string,
-  feedbackType?: "correct" | "wrong" | "success"
+  feedbackType?: "correct" | "wrong" | "success",
 ): MessageType {
   return {
     type: "BLOCK_PAGE",
@@ -122,6 +123,7 @@ function buildBlockMessage(
     currentQuestionIndex: state.currentQuestionIndex,
     consecutiveCorrect: state.consecutiveCorrect,
     requiredCorrect: state.requiredCorrect,
+    lastWrongSelectedIndex: state.lastWrongSelectedIndex,
     feedbackText,
     feedbackType,
   };
@@ -135,7 +137,10 @@ async function getTabsForDomain(domain: string): Promise<chrome.tabs.Tab[]> {
   });
 }
 
-async function sendMessageSafe(tabId: number, message: MessageType): Promise<void> {
+async function sendMessageSafe(
+  tabId: number,
+  message: MessageType,
+): Promise<void> {
   try {
     await chrome.tabs.sendMessage(tabId, message);
   } catch {
@@ -146,7 +151,7 @@ async function sendMessageSafe(tabId: number, message: MessageType): Promise<voi
 async function broadcastQuizState(
   domain: string,
   feedbackText?: string,
-  feedbackType?: "correct" | "wrong" | "success"
+  feedbackType?: "correct" | "wrong" | "success",
 ): Promise<void> {
   const state = quizStatesByDomain[domain];
   if (!state) return;
@@ -159,7 +164,7 @@ async function broadcastQuizState(
 async function broadcastUnblock(domain: string): Promise<void> {
   const tabs = await getTabsForDomain(domain);
   await Promise.all(
-    tabs.map((tab) => sendMessageSafe(tab.id!, { type: "UNBLOCK_PAGE" }))
+    tabs.map((tab) => sendMessageSafe(tab.id!, { type: "UNBLOCK_PAGE" })),
   );
 }
 
@@ -171,6 +176,7 @@ async function ensureQuizState(domain: string): Promise<DomainQuizState> {
       consecutiveCorrect: 0,
       requiredCorrect: REQUIRED_CORRECT,
       wrongAnswers: [],
+      lastWrongSelectedIndex: null,
     };
   }
 
@@ -179,7 +185,7 @@ async function ensureQuizState(domain: string): Promise<DomainQuizState> {
 
 async function syncBlockedTab(
   tabId: number | null,
-  domain: string | null
+  domain: string | null,
 ): Promise<void> {
   if (!tabId || !domain) return;
 
@@ -206,7 +212,7 @@ async function consumeDomainUsageAndUnblock(domain: string): Promise<number> {
 
 async function submitQuizCompletion(
   state: DomainQuizState,
-  usageSeconds: number
+  usageSeconds: number,
 ): Promise<void> {
   const settings = await getSettings();
   const user = await getUser();
@@ -233,7 +239,7 @@ async function submitQuizCompletion(
 
 async function handleQuizAnswer(
   senderTab: chrome.tabs.Tab | undefined,
-  selectedIndex: number
+  selectedIndex: number,
 ): Promise<void> {
   const domain = senderTab?.url ? extractDomain(senderTab.url) : null;
   if (!domain) return;
@@ -244,11 +250,13 @@ async function handleQuizAnswer(
   const state = await ensureQuizState(domain);
   if (state.questions.length === 0) return;
 
-  const q = state.questions[state.currentQuestionIndex % state.questions.length];
+  const q =
+    state.questions[state.currentQuestionIndex % state.questions.length];
   if (!q) return;
 
   if (selectedIndex === q.correctIndex) {
     state.consecutiveCorrect += 1;
+    state.lastWrongSelectedIndex = null;
 
     if (state.consecutiveCorrect >= state.requiredCorrect) {
       const usageSeconds = await consumeDomainUsageAndUnblock(domain);
@@ -262,13 +270,25 @@ async function handleQuizAnswer(
     await broadcastQuizState(
       domain,
       `Correct - ${state.requiredCorrect - state.consecutiveCorrect} more to go`,
-      "correct"
+      "correct",
+    );
+    return;
+  }
+
+  if (
+    state.lastWrongSelectedIndex !== null &&
+    selectedIndex === state.lastWrongSelectedIndex
+  ) {
+    await broadcastQuizState(
+      domain,
+      "Pick a different answer for this question.",
+      "wrong",
     );
     return;
   }
 
   state.consecutiveCorrect = 0;
-  state.currentQuestionIndex += 1;
+  state.lastWrongSelectedIndex = selectedIndex;
   state.wrongAnswers.push({
     question: q.question,
     options: q.options,
@@ -276,7 +296,28 @@ async function handleQuizAnswer(
     selectedIndex,
   });
 
-  await broadcastQuizState(domain, "Wrong answer. Streak reset.", "wrong");
+  const explanation = q.explanation?.trim();
+  const feedback = explanation
+    ? `Wrong answer.\n\nWhy this is correct:\n${explanation}`
+    : "Wrong answer.";
+  await broadcastQuizState(domain, feedback, "wrong");
+}
+
+async function handleNextQuestion(
+  senderTab: chrome.tabs.Tab | undefined,
+): Promise<void> {
+  const domain = senderTab?.url ? extractDomain(senderTab.url) : null;
+  if (!domain) return;
+
+  const data = await getTimeTracking();
+  if (!data[domain]?.blocked) return;
+
+  const state = await ensureQuizState(domain);
+  if (state.questions.length === 0) return;
+
+  state.currentQuestionIndex += 1;
+  state.lastWrongSelectedIndex = null;
+  await broadcastQuizState(domain);
 }
 
 // ---- Time Tracking ----
@@ -311,7 +352,7 @@ async function tickTimeTracking(): Promise<void> {
 
 async function triggerBlock(
   domain: string,
-  data: TimeTrackingData
+  data: TimeTrackingData,
 ): Promise<void> {
   data[domain].blocked = true;
   await saveTimeTracking(data);
@@ -393,36 +434,51 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 // ---- Message Handling ----
 
-chrome.runtime.onMessage.addListener((message: MessageType, sender, sendResponse) => {
-  if (message.type === "QUIZ_ANSWER") {
-    (async () => {
-      try {
-        await handleQuizAnswer(sender.tab, message.selectedIndex);
-        sendResponse({ success: true });
-      } catch (err) {
-        console.error("[ScrollStop] Failed handling quiz answer:", err);
-        sendResponse({ success: false });
-      }
-    })();
-    return true;
-  }
+chrome.runtime.onMessage.addListener(
+  (message: MessageType, sender, sendResponse) => {
+    if (message.type === "QUIZ_ANSWER") {
+      (async () => {
+        try {
+          await handleQuizAnswer(sender.tab, message.selectedIndex);
+          sendResponse({ success: true });
+        } catch (err) {
+          console.error("[ScrollStop] Failed handling quiz answer:", err);
+          sendResponse({ success: false });
+        }
+      })();
+      return true;
+    }
 
-  if (message.type === "GET_STATUS") {
-    (async () => {
-      const data = await getTimeTracking();
-      const settings = await getSettings();
-      const domain = currentDomain || "";
-      const info = data[domain];
-      sendResponse({
-        type: "STATUS_RESPONSE",
-        isBlocked: info?.blocked ?? false,
-        timeSpent: info?.totalSeconds ?? 0,
-        timeLimit: settings.timeLimitMinutes * 60,
-      });
-    })();
-    return true;
-  }
-});
+    if (message.type === "QUIZ_NEXT") {
+      (async () => {
+        try {
+          await handleNextQuestion(sender.tab);
+          sendResponse({ success: true });
+        } catch (err) {
+          console.error("[ScrollStop] Failed handling next question:", err);
+          sendResponse({ success: false });
+        }
+      })();
+      return true;
+    }
+
+    if (message.type === "GET_STATUS") {
+      (async () => {
+        const data = await getTimeTracking();
+        const settings = await getSettings();
+        const domain = currentDomain || "";
+        const info = data[domain];
+        sendResponse({
+          type: "STATUS_RESPONSE",
+          isBlocked: info?.blocked ?? false,
+          timeSpent: info?.totalSeconds ?? 0,
+          timeLimit: settings.timeLimitMinutes * 60,
+        });
+      })();
+      return true;
+    }
+  },
+);
 
 // ---- Init ----
 updateCurrentTab();

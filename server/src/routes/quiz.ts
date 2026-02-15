@@ -85,7 +85,7 @@ router.post("/submit", async (req, res) => {
             typeof w.question === "string" &&
             Array.isArray(w.options) &&
             typeof w.correctIndex === "number" &&
-            typeof w.selectedIndex === "number"
+            typeof w.selectedIndex === "number",
         )
         .map((w) => ({
           id: nanoid(),
