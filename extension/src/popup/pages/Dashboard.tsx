@@ -410,7 +410,7 @@ export function Dashboard({
           }}
         >
           <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-            Questions
+            Wrong Questions
           </div>
           <div
             style={{
