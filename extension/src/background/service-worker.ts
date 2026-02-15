@@ -6,6 +6,7 @@ import {
   type TimeTrackingData,
 } from "@/lib/storage";
 import type { QuizQuestion, MessageType } from "@/lib/types";
+import { API_BASE_URL } from "@/lib/serverConfig";
 
 const ALARM_NAME = "scrollstop-timer";
 const CHECK_INTERVAL_MINUTES = 0.25; // 15 seconds
@@ -29,7 +30,7 @@ function extractDomain(url: string): string | null {
 async function isTrackedDomain(domain: string): Promise<boolean> {
   const settings = await getSettings();
   return settings.trackedDomains.some(
-    (d) => d.enabled && domain.includes(d.domain)
+    (d) => d.enabled && domain.includes(d.domain),
   );
 }
 
@@ -69,7 +70,7 @@ async function tickTimeTracking(): Promise<void> {
 
 async function triggerBlock(
   domain: string,
-  data: TimeTrackingData
+  data: TimeTrackingData,
 ): Promise<void> {
   data[domain].blocked = true;
   await saveTimeTracking(data);
@@ -87,14 +88,11 @@ async function triggerBlock(
       // Fallback: use placeholder questions
       questions = getFallbackQuestions();
     } else {
-      const res = await fetch(
-        `http://localhost:3001/api/quiz/${roomId}?count=5`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/quiz/${roomId}?count=5`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       if (!res.ok) throw new Error(`Failed to fetch questions: ${res.status}`);
       questions = await res.json();
     }
@@ -206,60 +204,62 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 // ---- Message Handling ----
 
-chrome.runtime.onMessage.addListener((message: MessageType, _sender, sendResponse) => {
-  if (message.type === "QUIZ_COMPLETED") {
-    // Reset timer for the current domain
-    if (currentDomain) {
-      getTimeTracking().then(async (data) => {
-        if (data[currentDomain!]) {
-          data[currentDomain!].totalSeconds = 0;
-          data[currentDomain!].blocked = false;
-          await saveTimeTracking(data);
-        }
-      });
-    }
-
-    // Report to server
-    (async () => {
-      try {
-        const settings = await getSettings();
-        const user = await getUser();
-        if (settings.activeRoomId && user?.token) {
-          await fetch("http://localhost:3001/api/quiz/submit", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({
-              roomId: settings.activeRoomId,
-              score: message.score,
-              totalQuestions: 5,
-            }),
-          });
-        }
-      } catch (err) {
-        console.error("[ScrollStop] Failed to report quiz to server:", err);
+chrome.runtime.onMessage.addListener(
+  (message: MessageType, _sender, sendResponse) => {
+    if (message.type === "QUIZ_COMPLETED") {
+      // Reset timer for the current domain
+      if (currentDomain) {
+        getTimeTracking().then(async (data) => {
+          if (data[currentDomain!]) {
+            data[currentDomain!].totalSeconds = 0;
+            data[currentDomain!].blocked = false;
+            await saveTimeTracking(data);
+          }
+        });
       }
-    })();
 
-    sendResponse({ success: true });
-  } else if (message.type === "GET_STATUS") {
-    (async () => {
-      const data = await getTimeTracking();
-      const settings = await getSettings();
-      const domain = currentDomain || "";
-      const info = data[domain];
-      sendResponse({
-        type: "STATUS_RESPONSE",
-        isBlocked: info?.blocked ?? false,
-        timeSpent: info?.totalSeconds ?? 0,
-        timeLimit: settings.timeLimitMinutes * 60,
-      });
-    })();
-    return true; // keep channel open for async
-  }
-});
+      // Report to server
+      (async () => {
+        try {
+          const settings = await getSettings();
+          const user = await getUser();
+          if (settings.activeRoomId && user?.token) {
+            await fetch(`${API_BASE_URL}/quiz/submit`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
+              },
+              body: JSON.stringify({
+                roomId: settings.activeRoomId,
+                score: message.score,
+                totalQuestions: 5,
+              }),
+            });
+          }
+        } catch (err) {
+          console.error("[ScrollStop] Failed to report quiz to server:", err);
+        }
+      })();
+
+      sendResponse({ success: true });
+    } else if (message.type === "GET_STATUS") {
+      (async () => {
+        const data = await getTimeTracking();
+        const settings = await getSettings();
+        const domain = currentDomain || "";
+        const info = data[domain];
+        sendResponse({
+          type: "STATUS_RESPONSE",
+          isBlocked: info?.blocked ?? false,
+          timeSpent: info?.totalSeconds ?? 0,
+          timeLimit: settings.timeLimitMinutes * 60,
+        });
+      })();
+      return true; // keep channel open for async
+    }
+  },
+);
 
 // ---- Init ----
 updateCurrentTab();
