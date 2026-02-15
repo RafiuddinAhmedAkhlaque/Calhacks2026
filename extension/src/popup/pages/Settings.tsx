@@ -45,7 +45,10 @@ export function Settings({ onBack }: SettingsProps) {
 
   const addDomain = () => {
     if (!settings || !newDomain.trim()) return;
-    const domain = newDomain.trim().replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/.*$/, "");
+    const domain = newDomain
+      .trim()
+      .replace(/^(https?:\/\/)?(www\.)?/, "")
+      .replace(/\/.*$/, "");
     if (settings.trackedDomains.some((d) => d.domain === domain)) return;
     const domains: DomainConfig[] = [
       ...settings.trackedDomains,
@@ -81,10 +84,10 @@ export function Settings({ onBack }: SettingsProps) {
           style={{
             width: 28,
             height: 28,
-            border: '2px solid var(--bg-elevated)',
-            borderTopColor: 'var(--accent)',
-            borderRadius: '50%',
-            animation: 'spin 0.7s linear infinite',
+            border: "2px solid var(--bg-elevated)",
+            borderTopColor: "var(--accent)",
+            borderRadius: "50%",
+            animation: "spin 0.7s linear infinite",
           }}
         />
         <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
@@ -97,38 +100,51 @@ export function Settings({ onBack }: SettingsProps) {
       {/* Header */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           gap: 10,
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--border)',
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--border)",
         }}
       >
         <button
           onClick={onBack}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             width: 30,
             height: 30,
-            background: 'transparent',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            transition: 'all 0.15s',
+            background: "transparent",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius-sm)",
+            color: "var(--text-secondary)",
+            cursor: "pointer",
+            transition: "all 0.15s",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-accent)';
-            (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "var(--border-accent)";
+            (e.currentTarget as HTMLButtonElement).style.color =
+              "var(--accent)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
-            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "var(--border)";
+            (e.currentTarget as HTMLButtonElement).style.color =
+              "var(--text-secondary)";
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
@@ -136,11 +152,11 @@ export function Settings({ onBack }: SettingsProps) {
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: 'var(--text-primary)',
+            color: "var(--text-primary)",
             margin: 0,
-            fontFamily: 'var(--font-display)',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
+            fontFamily: "var(--font-display)",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
           }}
         >
           Settings
@@ -148,16 +164,16 @@ export function Settings({ onBack }: SettingsProps) {
         {saved && (
           <span
             style={{
-              marginLeft: 'auto',
+              marginLeft: "auto",
               fontSize: 10,
-              fontFamily: 'var(--font-display)',
+              fontFamily: "var(--font-display)",
               fontWeight: 700,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: 'var(--success)',
-              background: 'var(--success-dim)',
-              padding: '4px 10px',
-              borderRadius: 'var(--radius-sm)',
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "var(--success)",
+              background: "var(--success-dim)",
+              padding: "4px 10px",
+              borderRadius: "var(--radius-sm)",
             }}
           >
             Saved
@@ -165,27 +181,34 @@ export function Settings({ onBack }: SettingsProps) {
         )}
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {/* Time Limit */}
           <div>
             <label
               style={{
-                display: 'block',
-                fontFamily: 'var(--font-display)',
+                display: "block",
+                fontFamily: "var(--font-display)",
                 fontSize: 10,
                 fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--text-muted)",
                 marginBottom: 12,
               }}
             >
               Time limit
             </label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div
+                style={{
+                  flex: 1,
+                  height: "50%",
+                  background: "var(--bg-elevated)",
+                  borderRadius: 4,
+                  padding: "1px 0",
+                }}
+              >
                 <input
                   type="range"
                   min={1}
@@ -199,15 +222,23 @@ export function Settings({ onBack }: SettingsProps) {
               <div
                 style={{
                   minWidth: 52,
-                  textAlign: 'right',
-                  fontFamily: 'var(--font-display)',
+                  textAlign: "right",
+                  fontFamily: "var(--font-display)",
                   fontSize: 16,
                   fontWeight: 700,
-                  color: 'var(--text-primary)',
+                  color: "var(--text-primary)",
                 }}
               >
                 {settings.timeLimitMinutes}
-                <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 2 }}>min</span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    color: "var(--text-muted)",
+                    marginLeft: 2,
+                  }}
+                >
+                  min
+                </span>
               </div>
             </div>
           </div>
@@ -216,30 +247,30 @@ export function Settings({ onBack }: SettingsProps) {
           <div>
             <label
               style={{
-                display: 'block',
-                fontFamily: 'var(--font-display)',
+                display: "block",
+                fontFamily: "var(--font-display)",
                 fontSize: 10,
                 fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--text-muted)",
                 marginBottom: 10,
               }}
             >
               Tracked domains
             </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {settings.trackedDomains.map((d, i) => (
                 <div
                   key={d.domain}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: "flex",
+                    alignItems: "center",
                     gap: 10,
-                    padding: '10px 12px',
-                    background: 'var(--bg-surface)',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border)',
+                    padding: "10px 12px",
+                    background: "var(--bg-surface)",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--border)",
                   }}
                 >
                   {/* Toggle */}
@@ -249,45 +280,59 @@ export function Settings({ onBack }: SettingsProps) {
                       width: 34,
                       height: 18,
                       borderRadius: 9,
-                      background: d.enabled ? 'var(--accent)' : 'var(--bg-elevated)',
-                      border: d.enabled ? '1px solid var(--accent)' : '1px solid var(--border)',
-                      position: 'relative',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s, border-color 0.2s',
+                      background: d.enabled
+                        ? "var(--accent)"
+                        : "var(--bg-elevated)",
+                      border: d.enabled
+                        ? "1px solid var(--accent)"
+                        : "1px solid var(--border)",
+                      position: "relative",
+                      cursor: "pointer",
+                      transition: "background 0.2s, border-color 0.2s",
                       padding: 0,
                       flexShrink: 0,
                     }}
                   >
                     <div
                       style={{
-                        position: 'absolute',
+                        position: "absolute",
                         top: 2,
                         left: d.enabled ? 17 : 2,
                         width: 12,
                         height: 12,
-                        borderRadius: '50%',
-                        background: d.enabled ? 'var(--text-inverse)' : 'var(--text-muted)',
-                        transition: 'left 0.2s, background 0.2s',
+                        borderRadius: "50%",
+                        background: d.enabled
+                          ? "var(--text-inverse)"
+                          : "var(--text-muted)",
+                        transition: "left 0.2s, background 0.2s",
                       }}
                     />
                   </button>
 
-                  <span style={{
-                    flex: 1,
-                    fontSize: 13,
-                    color: d.enabled ? 'var(--text-primary)' : 'var(--text-muted)',
-                    transition: 'color 0.15s',
-                  }}>
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: 13,
+                      color: d.enabled
+                        ? "var(--text-primary)"
+                        : "var(--text-muted)",
+                      transition: "color 0.15s",
+                    }}
+                  >
                     {d.domain}
                   </span>
 
                   {timeData[d.domain] && (
-                    <span style={{
-                      fontSize: 10,
-                      fontFamily: 'var(--font-display)',
-                      color: timeData[d.domain].blocked ? 'var(--danger)' : 'var(--text-muted)',
-                      letterSpacing: '0.02em',
-                    }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontFamily: "var(--font-display)",
+                        color: timeData[d.domain].blocked
+                          ? "var(--danger)"
+                          : "var(--text-muted)",
+                        letterSpacing: "0.02em",
+                      }}
+                    >
                       {formatTime(timeData[d.domain].totalSeconds)}
                     </span>
                   )}
@@ -295,29 +340,42 @@ export function Settings({ onBack }: SettingsProps) {
                   <button
                     onClick={() => removeDomain(i)}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       width: 20,
                       height: 20,
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-muted)',
-                      cursor: 'pointer',
+                      background: "transparent",
+                      border: "none",
+                      color: "var(--text-muted)",
+                      cursor: "pointer",
                       padding: 0,
-                      transition: 'color 0.15s',
+                      transition: "color 0.15s",
                       opacity: 0.5,
                     }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--danger)';
-                      (e.currentTarget as HTMLButtonElement).style.opacity = '1';
+                      (e.currentTarget as HTMLButtonElement).style.color =
+                        "var(--danger)";
+                      (e.currentTarget as HTMLButtonElement).style.opacity =
+                        "1";
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)';
-                      (e.currentTarget as HTMLButtonElement).style.opacity = '0.5';
+                      (e.currentTarget as HTMLButtonElement).style.color =
+                        "var(--text-muted)";
+                      (e.currentTarget as HTMLButtonElement).style.opacity =
+                        "0.5";
                     }}
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M18 6 6 18" />
                       <path d="m6 6 12 12" />
                     </svg>
@@ -327,7 +385,7 @@ export function Settings({ onBack }: SettingsProps) {
             </div>
 
             {/* Add Domain */}
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               <input
                 type="text"
                 value={newDomain}
@@ -336,46 +394,48 @@ export function Settings({ onBack }: SettingsProps) {
                 onKeyDown={(e) => e.key === "Enter" && addDomain()}
                 style={{
                   flex: 1,
-                  padding: '10px 14px',
-                  background: 'var(--bg-surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)',
+                  padding: "10px 14px",
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--text-primary)",
                   fontSize: 13,
-                  fontFamily: 'var(--font-body)',
-                  outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                  fontFamily: "var(--font-body)",
+                  outline: "none",
+                  transition: "border-color 0.2s, box-shadow 0.2s",
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--border-accent)';
-                  e.target.style.boxShadow = '0 0 0 3px var(--accent-dim)';
+                  e.target.style.borderColor = "var(--border-accent)";
+                  e.target.style.boxShadow = "0 0 0 3px var(--accent-dim)";
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border)';
-                  e.target.style.boxShadow = 'none';
+                  e.target.style.borderColor = "var(--border)";
+                  e.target.style.boxShadow = "none";
                 }}
               />
               <button
                 onClick={addDomain}
                 style={{
-                  padding: '10px 16px',
-                  background: 'var(--accent)',
-                  color: 'var(--text-inverse)',
+                  padding: "10px 16px",
+                  background: "var(--accent)",
+                  color: "var(--text-inverse)",
                   fontSize: 11,
-                  fontFamily: 'var(--font-display)',
+                  fontFamily: "var(--font-display)",
                   fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  border: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  cursor: 'pointer',
-                  transition: 'background 0.15s',
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  border: "none",
+                  borderRadius: "var(--radius-sm)",
+                  cursor: "pointer",
+                  transition: "background 0.15s",
                 }}
                 onMouseEnter={(e) => {
-                  (e.target as HTMLButtonElement).style.background = 'var(--accent-hover)';
+                  (e.target as HTMLButtonElement).style.background =
+                    "var(--accent-hover)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.target as HTMLButtonElement).style.background = 'var(--accent)';
+                  (e.target as HTMLButtonElement).style.background =
+                    "var(--accent)";
                 }}
               >
                 Add
@@ -386,15 +446,22 @@ export function Settings({ onBack }: SettingsProps) {
           {/* Time Tracking Stats */}
           {Object.keys(timeData).length > 0 && (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
                 <label
                   style={{
-                    fontFamily: 'var(--font-display)',
+                    fontFamily: "var(--font-display)",
                     fontSize: 10,
                     fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: 'var(--text-muted)',
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--text-muted)",
                   }}
                 >
                   Time tracked
@@ -403,65 +470,90 @@ export function Settings({ onBack }: SettingsProps) {
                   onClick={resetAllTime}
                   style={{
                     fontSize: 10,
-                    fontFamily: 'var(--font-display)',
+                    fontFamily: "var(--font-display)",
                     fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
-                    color: 'var(--danger)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '2px 0',
-                    transition: 'opacity 0.15s',
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                    color: "var(--danger)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "2px 0",
+                    transition: "opacity 0.15s",
                     opacity: 0.7,
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.opacity = '1';
+                    (e.currentTarget as HTMLButtonElement).style.opacity = "1";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.opacity = '0.7';
+                    (e.currentTarget as HTMLButtonElement).style.opacity =
+                      "0.7";
                   }}
                 >
                   Reset all
                 </button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 {Object.entries(timeData).map(([domain, data]) => {
-                  const pct = settings.timeLimitMinutes > 0
-                    ? Math.min((data.totalSeconds / (settings.timeLimitMinutes * 60)) * 100, 100)
-                    : 0;
+                  const pct =
+                    settings.timeLimitMinutes > 0
+                      ? Math.min(
+                          (data.totalSeconds /
+                            (settings.timeLimitMinutes * 60)) *
+                            100,
+                          100,
+                        )
+                      : 0;
                   return (
                     <div
                       key={domain}
                       style={{
-                        padding: '10px 12px',
-                        background: 'var(--bg-surface)',
-                        borderRadius: 'var(--radius-sm)',
-                        border: '1px solid var(--border)',
+                        padding: "10px 12px",
+                        background: "var(--bg-surface)",
+                        borderRadius: "var(--radius-sm)",
+                        border: "1px solid var(--border)",
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{domain}</span>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: 6,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: "var(--text-secondary)",
+                          }}
+                        >
+                          {domain}
+                        </span>
                         <span
                           style={{
                             fontSize: 11,
-                            fontFamily: 'var(--font-display)',
+                            fontFamily: "var(--font-display)",
                             fontWeight: 700,
-                            color: data.blocked ? 'var(--danger)' : 'var(--text-primary)',
+                            color: data.blocked
+                              ? "var(--danger)"
+                              : "var(--text-primary)",
                           }}
                         >
                           {formatTime(data.totalSeconds)}
                           {data.blocked && (
-                            <span style={{
-                              marginLeft: 6,
-                              fontSize: 9,
-                              padding: '2px 6px',
-                              borderRadius: 4,
-                              background: 'var(--danger-dim)',
-                              color: 'var(--danger)',
-                              letterSpacing: '0.06em',
-                              textTransform: 'uppercase',
-                            }}>
+                            <span
+                              style={{
+                                marginLeft: 6,
+                                fontSize: 9,
+                                padding: "2px 6px",
+                                borderRadius: 4,
+                                background: "var(--danger-dim)",
+                                color: "var(--danger)",
+                                letterSpacing: "0.06em",
+                                textTransform: "uppercase",
+                              }}
+                            >
                               Blocked
                             </span>
                           )}
@@ -471,22 +563,22 @@ export function Settings({ onBack }: SettingsProps) {
                       <div
                         style={{
                           height: 3,
-                          background: 'var(--bg-elevated)',
+                          background: "var(--bg-elevated)",
                           borderRadius: 3,
-                          overflow: 'hidden',
+                          overflow: "hidden",
                         }}
                       >
                         <div
                           style={{
-                            height: '100%',
+                            height: "100%",
                             width: `${pct}%`,
                             background: data.blocked
-                              ? 'var(--danger)'
+                              ? "var(--danger)"
                               : pct > 75
-                                ? 'var(--warning)'
-                                : 'var(--accent)',
+                                ? "var(--warning)"
+                                : "var(--accent)",
                             borderRadius: 3,
-                            transition: 'width 0.4s ease',
+                            transition: "width 0.4s ease",
                           }}
                         />
                       </div>
