@@ -453,7 +453,7 @@ export function Dashboard({
               "var(--border)";
           }}
         >
-          Wrong Questions ({wrongQuestions.length})
+          Wrong Questions Count ({wrongQuestions.length})
         </button>
       </div>
 
