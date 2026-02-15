@@ -3,6 +3,7 @@ import {
   getSettings,
   saveSettings,
   getTimeTracking,
+  saveTimeTracking,
 } from "@/lib/storage";
 import type { ScrollStopSettings, DomainConfig } from "@/lib/types";
 import type { TimeTrackingData } from "@/lib/storage";
@@ -58,6 +59,13 @@ export function Settings({ onBack }: SettingsProps) {
     if (!settings) return;
     const domains = settings.trackedDomains.filter((_, i) => i !== index);
     handleSave({ trackedDomains: domains });
+  };
+
+  const resetAllTime = async () => {
+    await saveTimeTracking({});
+    setTimeData({});
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
   };
 
   const formatTime = (seconds: number) => {
@@ -378,20 +386,45 @@ export function Settings({ onBack }: SettingsProps) {
           {/* Time Tracking Stats */}
           {Object.keys(timeData).length > 0 && (
             <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: 'var(--text-muted)',
-                  marginBottom: 10,
-                }}
-              >
-                Time tracked
-              </label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <label
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Time tracked
+                </label>
+                <button
+                  onClick={resetAllTime}
+                  style={{
+                    fontSize: 10,
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    color: 'var(--danger)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px 0',
+                    transition: 'opacity 0.15s',
+                    opacity: 0.7,
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.opacity = '1';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.opacity = '0.7';
+                  }}
+                >
+                  Reset all
+                </button>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {Object.entries(timeData).map(([domain, data]) => {
                   const pct = settings.timeLimitMinutes > 0
