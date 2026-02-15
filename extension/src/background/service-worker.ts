@@ -2,6 +2,7 @@ import {
   getSettings,
   getTimeTracking,
   saveTimeTracking,
+  getUser,
   type TimeTrackingData,
 } from "@/lib/storage";
 import type { QuizQuestion, MessageType } from "@/lib/types";
@@ -80,17 +81,25 @@ async function triggerBlock(
   try {
     const settings = await getSettings();
     const roomId = settings.activeRoomId;
-    if (!roomId) {
+    const user = await getUser();
+
+    if (!roomId || !user?.token) {
       // Fallback: use placeholder questions
       questions = getFallbackQuestions();
     } else {
       const res = await fetch(
-        `http://localhost:3001/api/quiz/${roomId}?count=5`
+        `http://localhost:3001/api/quiz/${roomId}?count=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
       );
-      if (!res.ok) throw new Error("Failed to fetch questions");
+      if (!res.ok) throw new Error(`Failed to fetch questions: ${res.status}`);
       questions = await res.json();
     }
-  } catch {
+  } catch (err) {
+    console.error("[ScrollStop] Failed to fetch quiz questions:", err);
     questions = getFallbackQuestions();
   }
 
@@ -214,7 +223,6 @@ chrome.runtime.onMessage.addListener((message: MessageType, _sender, sendRespons
     (async () => {
       try {
         const settings = await getSettings();
-        const { getUser } = await import("@/lib/storage");
         const user = await getUser();
         if (settings.activeRoomId && user?.token) {
           await fetch("http://localhost:3001/api/quiz/submit", {

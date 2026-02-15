@@ -21,3 +21,4 @@ server/uploads/
 
 # Build output
 extension/dist/
+*.db-shm
