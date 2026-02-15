@@ -3,6 +3,7 @@ import { ScrollStopSettings, DEFAULT_SETTINGS } from "./types";
 const SETTINGS_KEY = "scrollstop_settings";
 const USER_KEY = "scrollstop_user";
 const TIME_TRACKING_KEY = "scrollstop_time_tracking";
+const ONBOARDED_KEY = "scrollstop_onboarded";
 
 // ---- Settings ----
 
@@ -67,4 +68,15 @@ export async function resetDomainTime(domain: string): Promise<void> {
     data[domain].blocked = false;
   }
   await saveTimeTracking(data);
+}
+
+// ---- Onboarding ----
+
+export async function getOnboarded(): Promise<boolean> {
+  const result = await chrome.storage.local.get(ONBOARDED_KEY);
+  return result[ONBOARDED_KEY] ?? false;
+}
+
+export async function setOnboarded(): Promise<void> {
+  await chrome.storage.local.set({ [ONBOARDED_KEY]: true });
 }
