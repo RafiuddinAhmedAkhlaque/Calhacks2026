@@ -13,6 +13,7 @@ interface DashboardProps {
   user: StoredUser;
   onOpenRoom: (roomId: string) => void;
   onOpenSettings: () => void;
+  onOpenWrongQuestions: () => void;
   onLogout: () => void;
 }
 
@@ -20,6 +21,7 @@ export function Dashboard({
   user,
   onOpenRoom,
   onOpenSettings,
+  onOpenWrongQuestions,
   onLogout,
 }: DashboardProps) {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -36,7 +38,6 @@ export function Dashboard({
   const [wrongQuestions, setWrongQuestions] = useState<WrongQuestionReview[]>(
     [],
   );
-  const [showWrongQuestions, setShowWrongQuestions] = useState(false);
 
   useEffect(() => {
     loadRooms();
@@ -426,7 +427,7 @@ export function Dashboard({
 
       <div style={{ padding: "0 16px 8px" }}>
         <button
-          onClick={() => setShowWrongQuestions((v) => !v)}
+          onClick={onOpenWrongQuestions}
           style={{
             width: "100%",
             padding: "8px 10px",
@@ -437,6 +438,19 @@ export function Dashboard({
             fontSize: 11,
             textAlign: "left",
             cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "var(--bg-hover)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "var(--border-accent)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "var(--bg-surface)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "var(--border)";
           }}
         >
           Wrong Questions ({wrongQuestions.length})
@@ -445,67 +459,6 @@ export function Dashboard({
 
       {/* Rooms List */}
       <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 16px" }}>
-        {showWrongQuestions && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-              marginBottom: 10,
-            }}
-          >
-            {wrongQuestions.length === 0 ? (
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-muted)",
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius-sm)",
-                  padding: "10px 12px",
-                }}
-              >
-                No wrong answers yet.
-              </div>
-            ) : (
-              wrongQuestions.slice(0, 10).map((w) => (
-                <div
-                  key={w.id}
-                  style={{
-                    background: "var(--bg-surface)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius-sm)",
-                    padding: "8px 10px",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "var(--text-primary)",
-                      fontWeight: 600,
-                      marginBottom: 4,
-                    }}
-                  >
-                    {w.question}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: "var(--danger)",
-                      marginBottom: 2,
-                    }}
-                  >
-                    Your answer: {w.options[w.selectedIndex] ?? "Unknown"}
-                  </div>
-                  <div style={{ fontSize: 10, color: "var(--success)" }}>
-                    Correct: {w.options[w.correctIndex] ?? "Unknown"}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
         {loading ? (
           <div
             className="flex items-center justify-center"
