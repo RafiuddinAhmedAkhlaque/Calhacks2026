@@ -88,7 +88,7 @@ export function RoomView({ roomId, user, onBack }: RoomViewProps) {
 
   if (!room) {
     return (
-      <div className="flex items-center justify-center h-[500px]">
+      <div className="flex items-center justify-center h-full">
         <div
           style={{
             width: 28,
@@ -105,7 +105,7 @@ export function RoomView({ roomId, user, onBack }: RoomViewProps) {
   }
 
   return (
-    <div className="page-enter flex flex-col h-[500px]">
+    <div className="page-enter flex flex-col h-full">
       {/* Header */}
       <div
         style={{

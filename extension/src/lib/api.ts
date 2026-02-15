@@ -4,6 +4,9 @@ import type {
   QuizQuestion,
   LeaderboardEntry,
   Document,
+  AllTimeStats,
+  WrongQuestionReview,
+  WrongAnswerPayload,
 } from "./types";
 import { getUser } from "./storage";
 import { API_BASE_URL } from "./serverConfig";
@@ -112,11 +115,19 @@ export async function getQuizQuestions(
 export async function submitQuizResult(
   roomId: string,
   score: number,
-  totalQuestions: number
+  totalQuestions: number,
+  usageSeconds: number = 0,
+  wrongAnswers: WrongAnswerPayload[] = []
 ): Promise<void> {
   return request("/quiz/submit", {
     method: "POST",
-    body: JSON.stringify({ roomId, score, totalQuestions }),
+    body: JSON.stringify({
+      roomId,
+      score,
+      totalQuestions,
+      usageSeconds,
+      wrongAnswers,
+    }),
   });
 }
 
@@ -126,4 +137,14 @@ export async function getLeaderboard(
   roomId: string
 ): Promise<LeaderboardEntry[]> {
   return request(`/leaderboard/${roomId}`);
+}
+
+// ---- Analytics ----
+
+export async function getMyStats(): Promise<AllTimeStats> {
+  return request("/stats/me");
+}
+
+export async function getWrongQuestions(): Promise<WrongQuestionReview[]> {
+  return request("/review/wrong-questions");
 }

@@ -35,7 +35,7 @@ export function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="page-enter flex flex-col items-center justify-center h-[500px] px-10">
+    <div className="page-enter flex flex-col items-center justify-center h-full px-10">
       {/* Decorative top bar */}
       <div
         style={{

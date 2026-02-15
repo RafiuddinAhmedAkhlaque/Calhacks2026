@@ -28,25 +28,28 @@ export function Popup() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[500px]" style={{ background: 'var(--bg-deep)' }}>
+      <div
+        className="flex items-center justify-center h-full w-full"
+        style={{ background: "var(--bg-deep)" }}
+      >
         <div className="flex flex-col items-center gap-4">
           <div
             style={{
               width: 28,
               height: 28,
-              border: '2px solid var(--bg-elevated)',
-              borderTopColor: 'var(--accent)',
-              borderRadius: '50%',
-              animation: 'spin 0.7s linear infinite',
+              border: "2px solid var(--bg-elevated)",
+              borderTopColor: "var(--accent)",
+              borderRadius: "50%",
+              animation: "spin 0.7s linear infinite",
             }}
           />
           <span
             style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: "var(--font-display)",
               fontSize: 11,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase' as const,
-              color: 'var(--text-muted)',
+              letterSpacing: "0.15em",
+              textTransform: "uppercase" as const,
+              color: "var(--text-muted)",
             }}
           >
             Loading

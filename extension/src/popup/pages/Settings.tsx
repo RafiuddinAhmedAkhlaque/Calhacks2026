@@ -27,6 +27,15 @@ export function Settings({ onBack }: SettingsProps) {
     })();
   }, []);
 
+  useEffect(() => {
+    const id = setInterval(async () => {
+      const t = await getTimeTracking();
+      setTimeData(t);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
   const handleSave = async (updates: Partial<ScrollStopSettings>) => {
     if (!settings) return;
     const updated = { ...settings, ...updates };
@@ -79,7 +88,7 @@ export function Settings({ onBack }: SettingsProps) {
 
   if (!settings) {
     return (
-      <div className="flex items-center justify-center h-[500px]">
+      <div className="flex items-center justify-center h-full">
         <div
           style={{
             width: 28,
@@ -96,7 +105,7 @@ export function Settings({ onBack }: SettingsProps) {
   }
 
   return (
-    <div className="page-enter flex flex-col h-[500px]">
+    <div className="page-enter flex flex-col h-full">
       {/* Header */}
       <div
         style={{

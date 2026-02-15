@@ -30,6 +30,15 @@ export interface QuizQuestion {
   correctIndex: number;
 }
 
+export interface WrongAnswerPayload {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  selectedIndex: number;
+  roomId?: string;
+  documentId?: string;
+}
+
 export interface Document {
   id: string;
   roomId: string;
@@ -46,6 +55,22 @@ export interface LeaderboardEntry {
   streak: number;
   quizzesCompleted: number;
   rank: number;
+}
+
+export interface AllTimeStats {
+  totalUsageSeconds: number;
+  totalQuestionsCompleted: number;
+}
+
+export interface WrongQuestionReview {
+  id: string;
+  roomId: string | null;
+  documentId: string | null;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  selectedIndex: number;
+  createdAt: string;
 }
 
 export interface DomainConfig {
@@ -77,9 +102,22 @@ export const DEFAULT_SETTINGS: ScrollStopSettings = {
 
 // Messages between background <-> content script
 export type MessageType =
-  | { type: "BLOCK_PAGE"; questions: QuizQuestion[] }
+  | {
+      type: "BLOCK_PAGE";
+      questions: QuizQuestion[];
+      currentQuestionIndex?: number;
+      consecutiveCorrect?: number;
+      requiredCorrect?: number;
+      feedbackText?: string;
+      feedbackType?: "correct" | "wrong" | "success";
+    }
   | { type: "UNBLOCK_PAGE" }
-  | { type: "QUIZ_COMPLETED"; score: number }
+  | { type: "QUIZ_ANSWER"; selectedIndex: number }
+  | {
+      type: "QUIZ_COMPLETED";
+      score: number;
+      wrongAnswers?: WrongAnswerPayload[];
+    }
   | { type: "GET_STATUS" }
   | {
       type: "STATUS_RESPONSE";
