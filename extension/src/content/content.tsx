@@ -95,17 +95,19 @@ function renderQuiz(): void {
         </div>
 
         <div class="scrollstop-footer">
-          ${
-            feedbackType === "wrong" && !answerRevealed
-              ? `<button class="scrollstop-reveal-btn" id="scrollstop-reveal-btn">Reveal answer</button>`
-              : ""
-          }
-          ${
-            feedbackType === "wrong" && answerRevealed
-              ? `<button class="scrollstop-next-btn" id="scrollstop-next-btn">Next question</button>`
-              : ""
-          }
           <div class="scrollstop-streak-warning" id="scrollstop-feedback"></div>
+          <div class="scrollstop-footer-actions">
+            ${
+              feedbackType === "wrong" && !answerRevealed
+                ? `<button class="scrollstop-reveal-btn" id="scrollstop-reveal-btn">Reveal answer</button>`
+                : ""
+            }
+            ${
+              feedbackType === "wrong" && answerRevealed
+                ? `<button class="scrollstop-next-btn" id="scrollstop-next-btn">Next question</button>`
+                : ""
+            }
+          </div>
         </div>
       </div>
     </div>

@@ -4,7 +4,6 @@ export interface User {
   id: string;
   username: string;
   createdAt: string;
-  coins?: number;
 }
 
 export interface Room {
@@ -14,7 +13,6 @@ export interface Room {
   createdBy: string;
   members: RoomMember[];
   createdAt: string;
-  poolCoins?: number;
 }
 
 export interface RoomMember {

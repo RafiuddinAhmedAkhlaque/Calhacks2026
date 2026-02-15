@@ -26,7 +26,6 @@ export interface StoredUser {
   id: string;
   username: string;
   token: string;
-  coins?: number;
 }
 
 export async function getUser(): Promise<StoredUser | null> {

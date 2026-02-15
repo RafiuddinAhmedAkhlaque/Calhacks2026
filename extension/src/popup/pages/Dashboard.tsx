@@ -5,7 +5,6 @@ import {
   joinRoom,
   getMyStats,
   getWrongQuestions,
-  getMe,
 } from "@/lib/api";
 import { clearUser, type StoredUser } from "@/lib/storage";
 import type { Room, AllTimeStats, WrongQuestionReview } from "@/lib/types";
@@ -39,7 +38,6 @@ export function Dashboard({
   const [wrongQuestions, setWrongQuestions] = useState<WrongQuestionReview[]>(
     [],
   );
-  const [coins, setCoins] = useState<number>(user.coins ?? 0);
 
   useEffect(() => {
     loadRooms();
@@ -50,19 +48,12 @@ export function Dashboard({
       const r = await getMyRooms();
       setRooms(r);
 
-      const [s, w, me] = await Promise.allSettled([
-        getMyStats(),
-        getWrongQuestions(),
-        getMe(),
-      ]);
+      const [s, w] = await Promise.allSettled([getMyStats(), getWrongQuestions()]);
       if (s.status === "fulfilled") {
         setStats(s.value);
       }
       if (w.status === "fulfilled") {
         setWrongQuestions(w.value);
-      }
-      if (me.status === "fulfilled") {
-        setCoins(me.value.coins ?? 0);
       }
     } catch (err) {
       console.error("Failed to load rooms:", err);
@@ -78,8 +69,6 @@ export function Dashboard({
     try {
       const room = await createRoom(newRoomName.trim());
       setRooms((prev) => [...prev, room]);
-      const me = await getMe();
-      setCoins(me.coins ?? 0);
       setShowCreate(false);
       setNewRoomName("");
     } catch (err) {
@@ -94,8 +83,6 @@ export function Dashboard({
     try {
       const room = await joinRoom(joinCode.trim());
       setRooms((prev) => [...prev, room]);
-      const me = await getMe();
-      setCoins(me.coins ?? 0);
       setShowJoin(false);
       setJoinCode("");
     } catch (err) {
@@ -179,26 +166,6 @@ export function Dashboard({
           </p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "6px 10px",
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border)",
-              borderRadius: "999px",
-              color: "var(--text-primary)",
-              fontFamily: "var(--font-display)",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.03em",
-            }}
-            title="Coins"
-          >
-            <span style={{ color: "#fbbf24", fontSize: 12 }}>$</span>
-            {coins}
-          </div>
           <button
             onClick={onOpenSettings}
             style={{
