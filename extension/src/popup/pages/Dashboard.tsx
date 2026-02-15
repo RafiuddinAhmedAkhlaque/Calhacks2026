@@ -411,7 +411,7 @@ export function Dashboard({
           }}
         >
           <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-            Wrong Questions
+            Total Questions Answered
           </div>
           <div
             style={{

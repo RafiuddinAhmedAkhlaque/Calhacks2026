@@ -114,8 +114,8 @@ export function WrongQuestions({ onBack }: WrongQuestionsProps) {
       <div
         style={{
           flex: 1,
-          overflowY: "auto",
-          padding: "16px",
+          flexDirection: "column",
+          padding: "16px"
         }}
       >
         {questions.length === 0 ? (
