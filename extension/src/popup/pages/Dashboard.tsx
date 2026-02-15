@@ -400,7 +400,7 @@ export function Dashboard({
             padding: "8px 10px",
           }}
         >
-          <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Usage</div>
+          <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Time Spent Not Locked In Today</div>
           <div
             style={{
               fontSize: 12,
@@ -421,7 +421,7 @@ export function Dashboard({
           }}
         >
           <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-            Wrong Questions
+            Number of Questions Answered All-Time
           </div>
           <div
             style={{
