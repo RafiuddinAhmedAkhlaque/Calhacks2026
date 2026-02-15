@@ -11,6 +11,7 @@ import roomsRouter from "./routes/rooms.js";
 import documentsRouter from "./routes/documents.js";
 import quizRouter from "./routes/quiz.js";
 import leaderboardRouter from "./routes/leaderboard.js";
+import analyticsRouter from "./routes/analytics.js";
 
 // Services
 import { getLeaderboard } from "./services/roomManager.js";
@@ -41,6 +42,7 @@ app.use("/api/rooms", roomsRouter);
 app.use("/api/documents", documentsRouter);
 app.use("/api/quiz", quizRouter);
 app.use("/api/leaderboard", leaderboardRouter);
+app.use("/api", analyticsRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {

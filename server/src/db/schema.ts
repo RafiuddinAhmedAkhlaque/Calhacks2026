@@ -57,3 +57,28 @@ export const questions = sqliteTable("questions", {
   correctIndex: integer("correct_index").notNull(),
   createdAt: text("created_at").notNull(),
 });
+
+export const userStats = sqliteTable("user_stats", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id),
+  totalUsageSeconds: integer("total_usage_seconds").notNull().default(0),
+  totalQuestionsCompleted: integer("total_questions_completed")
+    .notNull()
+    .default(0),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const wrongQuestions = sqliteTable("wrong_questions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  roomId: text("room_id").references(() => rooms.id),
+  documentId: text("document_id").references(() => documents.id),
+  question: text("question").notNull(),
+  options: text("options").notNull(),
+  correctIndex: integer("correct_index").notNull(),
+  selectedIndex: integer("selected_index").notNull(),
+  createdAt: text("created_at").notNull(),
+});

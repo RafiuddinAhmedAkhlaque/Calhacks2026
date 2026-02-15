@@ -1,32 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --bg-deep: #0C0C0C;
+  --bg-deep: #0c0c0c;
   --bg-surface: #161616;
-  --bg-elevated: #1E1E1E;
+  --bg-elevated: #1e1e1e;
   --bg-hover: #252525;
 
-  --accent: #E53E3E;
+  --accent: #e53e3e;
   --accent-dim: rgba(229, 62, 62, 0.12);
-  --accent-hover: #F56565;
+  --accent-hover: #f56565;
   --accent-glow: rgba(229, 62, 62, 0.25);
 
-  --success: #4ADE80;
+  --success: #4ade80;
   --success-dim: rgba(74, 222, 128, 0.12);
-  --danger: #FF4A4A;
+  --danger: #ff4a4a;
   --danger-dim: rgba(255, 74, 74, 0.12);
-  --warning: #FBBF24;
+  --warning: #fbbf24;
 
-  --text-primary: #F5F0EB;
-  --text-secondary: #A09A93;
-  --text-muted: #5C5852;
-  --text-inverse: #0C0C0C;
+  --text-primary: #f5f0eb;
+  --text-secondary: #a09a93;
+  --text-muted: #5c5852;
+  --text-inverse: #0c0c0c;
 
   --border: rgba(255, 255, 255, 0.06);
   --border-accent: rgba(229, 62, 62, 0.2);
 
-  --font-display: 'Space Mono', monospace;
-  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-display: "Space Mono", monospace;
+  --font-body: "DM Sans", system-ui, sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -38,8 +38,8 @@
 }
 
 body {
-  width: 400px;
-  min-height: 500px;
+  width: 100%;
+  min-height: 100%;
   margin: 0;
   font-family: var(--font-body);
   background: var(--bg-deep);
@@ -48,15 +48,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body,
+#root {
+  height: 100vh;
+}
+
 /* Noise texture overlay on root */
 #root {
   width: 100%;
-  min-height: 500px;
+  min-height: 100%;
   position: relative;
 }
 
 #root::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   opacity: 0.03;
@@ -119,7 +125,8 @@ body {
 
 /* Pulse glow for active indicators */
 @keyframes pulseGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 var(--accent-glow);
   }
   50% {

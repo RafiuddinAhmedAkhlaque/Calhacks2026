@@ -4,12 +4,14 @@ import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { RoomView } from "./pages/RoomView";
 import { Settings } from "./pages/Settings";
+import { WrongQuestions } from "./pages/WrongQuestions";
 
 type Page =
   | { name: "login" }
   | { name: "dashboard" }
   | { name: "room"; roomId: string }
-  | { name: "settings" };
+  | { name: "settings" }
+  | { name: "wrongQuestions" };
 
 export function Popup() {
   const [user, setUser] = useState<StoredUser | null>(null);
@@ -28,25 +30,28 @@ export function Popup() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[500px]" style={{ background: 'var(--bg-deep)' }}>
+      <div
+        className="flex items-center justify-center h-full w-full"
+        style={{ background: "var(--bg-deep)" }}
+      >
         <div className="flex flex-col items-center gap-4">
           <div
             style={{
               width: 28,
               height: 28,
-              border: '2px solid var(--bg-elevated)',
-              borderTopColor: 'var(--accent)',
-              borderRadius: '50%',
-              animation: 'spin 0.7s linear infinite',
+              border: "2px solid var(--bg-elevated)",
+              borderTopColor: "var(--accent)",
+              borderRadius: "50%",
+              animation: "spin 0.7s linear infinite",
             }}
           />
           <span
             style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: "var(--font-display)",
               fontSize: 11,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase' as const,
-              color: 'var(--text-muted)',
+              letterSpacing: "0.15em",
+              textTransform: "uppercase" as const,
+              color: "var(--text-muted)",
             }}
           >
             Loading
@@ -76,6 +81,7 @@ export function Popup() {
           user={user!}
           onOpenRoom={(roomId) => setPage({ name: "room", roomId })}
           onOpenSettings={() => setPage({ name: "settings" })}
+          onOpenWrongQuestions={() => setPage({ name: "wrongQuestions" })}
           onLogout={handleLogout}
         />
       );
@@ -89,5 +95,7 @@ export function Popup() {
       );
     case "settings":
       return <Settings onBack={() => setPage({ name: "dashboard" })} />;
+    case "wrongQuestions":
+      return <WrongQuestions onBack={() => setPage({ name: "dashboard" })} />;
   }
 }

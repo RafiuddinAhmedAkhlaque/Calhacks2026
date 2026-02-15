@@ -5,16 +5,19 @@ let overlayContainer: HTMLDivElement | null = null;
 let questions: QuizQuestion[] = [];
 let currentQuestionIndex = 0;
 let consecutiveCorrect = 0;
-const REQUIRED_CORRECT = 5;
+let requiredCorrect = 5;
+let feedbackText = "";
+let feedbackType: "correct" | "wrong" | "success" = "correct";
+let answerPending = false;
 
 // ---- Overlay Management ----
 
 function createOverlay(): void {
-  if (overlayContainer) return;
-
-  overlayContainer = document.createElement("div");
-  overlayContainer.id = "scrollstop-overlay";
-  document.body.appendChild(overlayContainer);
+  if (!overlayContainer) {
+    overlayContainer = document.createElement("div");
+    overlayContainer.id = "scrollstop-overlay";
+    document.body.appendChild(overlayContainer);
+  }
 
   renderQuiz();
 }
@@ -30,14 +33,14 @@ function renderQuiz(): void {
   if (!overlayContainer || questions.length === 0) return;
 
   const q = questions[currentQuestionIndex % questions.length];
-  const progressPct = (consecutiveCorrect / REQUIRED_CORRECT) * 100;
+  if (!q) return;
 
-  // Build streak dots
-  const dots = Array.from({ length: REQUIRED_CORRECT }, (_, i) => {
+  const progressPct = (consecutiveCorrect / requiredCorrect) * 100;
+  const dots = Array.from({ length: requiredCorrect }, (_, i) => {
     const filled = i < consecutiveCorrect;
     const justFilled = i === consecutiveCorrect - 1 && consecutiveCorrect > 0;
-    return `<div class="scrollstop-dot${filled ? ' filled' : ''}${justFilled ? ' pulse' : ''}"></div>`;
-  }).join('');
+    return `<div class="scrollstop-dot${filled ? " filled" : ""}${justFilled ? " pulse" : ""}"></div>`;
+  }).join("");
 
   overlayContainer.innerHTML = `
     <div class="scrollstop-backdrop">
@@ -49,7 +52,7 @@ function renderQuiz(): void {
         <div class="scrollstop-header">
           <div class="scrollstop-brand">
             <div class="scrollstop-logo">ScrollStop</div>
-            <div class="scrollstop-subtitle">${REQUIRED_CORRECT - consecutiveCorrect} more to unlock</div>
+            <div class="scrollstop-subtitle">${requiredCorrect - consecutiveCorrect} more to unlock</div>
           </div>
           <div class="scrollstop-dots">
             ${dots}
@@ -83,57 +86,26 @@ function renderQuiz(): void {
     </div>
   `;
 
-  // Bind click handlers
+  const feedbackEl = overlayContainer.querySelector(
+    "#scrollstop-feedback"
+  ) as HTMLElement | null;
+  if (feedbackEl && feedbackText) {
+    feedbackEl.textContent = feedbackText;
+    feedbackEl.className = `scrollstop-streak-warning scrollstop-${feedbackType}`;
+  }
+
   const buttons = overlayContainer.querySelectorAll(".scrollstop-option");
   buttons.forEach((btn) => {
     btn.addEventListener("click", (e) => {
+      if (answerPending) return;
+      answerPending = true;
+
       const target = e.currentTarget as HTMLElement;
       const idx = parseInt(target.dataset.index || "0", 10);
-      handleAnswer(idx, q.correctIndex);
+
+      chrome.runtime.sendMessage({ type: "QUIZ_ANSWER", selectedIndex: idx });
     });
   });
-}
-
-function handleAnswer(selectedIndex: number, correctIndex: number): void {
-  const feedback = document.getElementById("scrollstop-feedback");
-
-  if (selectedIndex === correctIndex) {
-    consecutiveCorrect++;
-
-    if (consecutiveCorrect >= REQUIRED_CORRECT) {
-      if (feedback) {
-        feedback.textContent = "Page unlocked. Get back to work.";
-        feedback.className = "scrollstop-streak-warning scrollstop-success";
-      }
-
-      chrome.runtime.sendMessage({ type: "QUIZ_COMPLETED", score: REQUIRED_CORRECT });
-
-      setTimeout(() => {
-        removeOverlay();
-        questions = [];
-        currentQuestionIndex = 0;
-        consecutiveCorrect = 0;
-      }, 1000);
-      return;
-    }
-
-    if (feedback) {
-      feedback.textContent = `Correct — ${REQUIRED_CORRECT - consecutiveCorrect} more to go`;
-      feedback.className = "scrollstop-streak-warning scrollstop-correct";
-    }
-  } else {
-    consecutiveCorrect = 0;
-    if (feedback) {
-      feedback.textContent = "Wrong answer. Streak reset.";
-      feedback.className = "scrollstop-streak-warning scrollstop-wrong";
-    }
-  }
-
-  currentQuestionIndex++;
-
-  setTimeout(() => {
-    renderQuiz();
-  }, 1200);
 }
 
 // ---- Message Listener ----
@@ -142,11 +114,21 @@ chrome.runtime.onMessage.addListener(
   (message: MessageType, _sender, sendResponse) => {
     if (message.type === "BLOCK_PAGE") {
       questions = message.questions;
-      currentQuestionIndex = 0;
-      consecutiveCorrect = 0;
+      currentQuestionIndex = message.currentQuestionIndex ?? 0;
+      consecutiveCorrect = message.consecutiveCorrect ?? 0;
+      requiredCorrect = message.requiredCorrect ?? 5;
+      feedbackText = message.feedbackText ?? "";
+      feedbackType = message.feedbackType ?? "correct";
+      answerPending = false;
       createOverlay();
       sendResponse({ success: true });
     } else if (message.type === "UNBLOCK_PAGE") {
+      questions = [];
+      currentQuestionIndex = 0;
+      consecutiveCorrect = 0;
+      requiredCorrect = 5;
+      feedbackText = "";
+      answerPending = false;
       removeOverlay();
       sendResponse({ success: true });
     }

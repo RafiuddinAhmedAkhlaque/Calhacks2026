@@ -2,6 +2,10 @@ import { Router } from "express";
 import { getRandomQuestions } from "../services/quizGenerator.js";
 import { updateMemberScore } from "../services/roomManager.js";
 import { authenticate } from "../middleware.js";
+import { db } from "../db/index.js";
+import { userStats, wrongQuestions } from "../db/schema.js";
+import { eq, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 const router = Router();
 router.use(authenticate);
@@ -29,7 +33,8 @@ router.get("/:roomId", async (req, res) => {
 // POST /api/quiz/submit
 router.post("/submit", async (req, res) => {
   try {
-    const { roomId, score, totalQuestions } = req.body;
+    const { roomId, score, totalQuestions, usageSeconds, wrongAnswers } =
+      req.body;
 
     if (!roomId || typeof score !== "number") {
       res.status(400).json({ error: "roomId and score are required" });
@@ -41,6 +46,62 @@ router.post("/submit", async (req, res) => {
     if (!result) {
       res.status(404).json({ error: "Not a member of this room" });
       return;
+    }
+
+    const now = new Date().toISOString();
+    const safeTotalQuestions =
+      typeof totalQuestions === "number" && totalQuestions > 0
+        ? Math.floor(totalQuestions)
+        : 0;
+    const safeUsageSeconds =
+      typeof usageSeconds === "number" && usageSeconds > 0
+        ? Math.floor(usageSeconds)
+        : 0;
+
+    await db
+      .insert(userStats)
+      .values({
+        userId: req.userId!,
+        totalUsageSeconds: 0,
+        totalQuestionsCompleted: 0,
+        updatedAt: now,
+      })
+      .onConflictDoNothing();
+
+    await db
+      .update(userStats)
+      .set({
+        totalUsageSeconds: sql`${userStats.totalUsageSeconds} + ${safeUsageSeconds}`,
+        totalQuestionsCompleted: sql`${userStats.totalQuestionsCompleted} + ${safeTotalQuestions}`,
+        updatedAt: now,
+      })
+      .where(eq(userStats.userId, req.userId!));
+
+    if (Array.isArray(wrongAnswers) && wrongAnswers.length > 0) {
+      const rows = wrongAnswers
+        .filter(
+          (w) =>
+            w &&
+            typeof w.question === "string" &&
+            Array.isArray(w.options) &&
+            typeof w.correctIndex === "number" &&
+            typeof w.selectedIndex === "number"
+        )
+        .map((w) => ({
+          id: nanoid(),
+          userId: req.userId!,
+          roomId: typeof w.roomId === "string" ? w.roomId : roomId,
+          documentId: typeof w.documentId === "string" ? w.documentId : null,
+          question: w.question,
+          options: JSON.stringify(w.options),
+          correctIndex: Math.floor(w.correctIndex),
+          selectedIndex: Math.floor(w.selectedIndex),
+          createdAt: now,
+        }));
+
+      if (rows.length > 0) {
+        await db.insert(wrongQuestions).values(rows);
+      }
     }
 
     res.json(result);
