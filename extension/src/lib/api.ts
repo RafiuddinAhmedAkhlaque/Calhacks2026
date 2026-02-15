@@ -6,8 +6,9 @@ import type {
   Document,
 } from "./types";
 import { getUser } from "./storage";
+import { API_BASE_URL } from "./serverConfig";
 
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = API_BASE_URL;
 
 async function authHeaders(): Promise<HeadersInit> {
   const user = await getUser();

@@ -1,6 +1,7 @@
 import { io, type Socket } from "socket.io-client";
+import { SERVER_BASE_URL } from "./serverConfig";
 
-const SOCKET_URL = "http://localhost:3001";
+const SOCKET_URL = SERVER_BASE_URL;
 
 let socket: Socket | null = null;
 
